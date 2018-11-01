@@ -2,4 +2,6 @@
     <string name="app_name">TexasHoldem</string>
     <string name="play">Play</string>
     <string name="help">Help</string>
+    <string name="texas_holdem">No-limit Texas Hold\'em</string>
+
 </resources>

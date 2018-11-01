@@ -4,8 +4,137 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#0C762A"
     tools:context=".GameActivity">
 
+    <!-- money textView-->
 
+    <TextView
+        android:id="@+id/opponent_money"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="$20000" />
+
+    <TextView
+        android:id="@+id/my_money"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:text="$20000" />
+
+    <!-- opponent cards -->
+
+    <ImageView
+        android:id="@+id/opponent_card1"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_margin="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/opponent_card2"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_margin="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/opponent_card1"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- table cards  -->
+
+    <ImageView
+        android:id="@+id/table_card1"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/table_card2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/table_card2"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/table_card1"
+        app:layout_constraintRight_toLeftOf="@+id/table_card3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/table_card3"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/table_card2"
+        app:layout_constraintRight_toLeftOf="@+id/table_card4"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/table_card4"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/table_card3"
+        app:layout_constraintRight_toLeftOf="@+id/table_card5"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/table_card5"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/table_card4"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- my cards -->
+
+    <ImageView
+        android:id="@+id/my_hand1"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/my_hand2" />
+
+    <ImageView
+        android:id="@+id/my_hand2"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <!-- buttons -->
+
+    <Button
+        android:id="@+id/foul"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/call"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/raise"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </android.support.constraint.ConstraintLayout>
