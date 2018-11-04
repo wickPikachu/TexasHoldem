@@ -7,134 +7,276 @@
     android:background="#0C762A"
     tools:context=".GameActivity">
 
-    <!-- money textView-->
-
-    <TextView
-        android:id="@+id/opponent_money"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:textColor="#ffffff"
-        android:textSize="18sp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="$20000" />
-
-    <TextView
-        android:id="@+id/my_money"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:textColor="#ffffff"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        tools:text="$20000" />
-
     <!-- opponent cards -->
 
-    <ImageView
-        android:id="@+id/opponent_card1"
-        android:layout_width="50dp"
-        android:layout_height="70dp"
-        android:layout_margin="8dp"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/opponent_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/table_cards_layout"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread_inside">
 
-    <ImageView
-        android:id="@+id/opponent_card2"
-        android:layout_width="50dp"
-        android:layout_height="70dp"
-        android:layout_margin="8dp"
-        app:layout_constraintLeft_toRightOf="@+id/opponent_card1"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/round"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="@string/round"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/opponent_card1"
+            android:layout_width="60dp"
+            android:layout_height="90dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/gray_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/opponent_card2"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/opponent_card2"
+            android:layout_width="60dp"
+            android:layout_height="90dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/gray_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/opponent_card1"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/opponent_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="@string/opponent"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/opponent_money"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/opponent_money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="$20000" />
+
+    </android.support.constraint.ConstraintLayout>
 
     <!-- table cards  -->
 
-    <ImageView
-        android:id="@+id/table_card1"
-        android:layout_width="50dp"
-        android:layout_height="70dp"
-        android:layout_margin="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/table_card2"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/table_card2"
-        android:layout_width="50dp"
-        android:layout_height="70dp"
-        android:layout_margin="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/table_card1"
-        app:layout_constraintRight_toLeftOf="@+id/table_card3"
-        app:layout_constraintTop_toTopOf="parent" />
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/table_cards_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/buttons_layout"
+        app:layout_constraintTop_toBottomOf="@+id/opponent_layout">
 
-    <ImageView
-        android:id="@+id/table_card3"
-        android:layout_width="50dp"
-        android:layout_height="70dp"
-        android:layout_margin="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/table_card2"
-        app:layout_constraintRight_toLeftOf="@+id/table_card4"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/opponent_bets_money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/table_card1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="$200" />
 
-    <ImageView
-        android:id="@+id/table_card4"
-        android:layout_width="50dp"
-        android:layout_height="70dp"
-        android:layout_margin="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/table_card3"
-        app:layout_constraintRight_toLeftOf="@+id/table_card5"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/my_bets_money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/table_card1"
+            tools:text="$100" />
 
-    <ImageView
-        android:id="@+id/table_card5"
-        android:layout_width="50dp"
-        android:layout_height="70dp"
-        android:layout_margin="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/table_card4"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/table_card1"
+            android:layout_width="60dp"
+            android:layout_height="90dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/gray_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/table_card2"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- my cards -->
+        <ImageView
+            android:id="@+id/table_card2"
+            android:layout_width="60dp"
+            android:layout_height="90dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/gray_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/table_card1"
+            app:layout_constraintRight_toLeftOf="@+id/table_card3"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/my_hand1"
-        android:layout_width="50dp"
-        android:layout_height="70dp"
-        android:layout_margin="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/my_hand2" />
+        <ImageView
+            android:id="@+id/table_card3"
+            android:layout_width="60dp"
+            android:layout_height="90dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/gray_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/table_card2"
+            app:layout_constraintRight_toLeftOf="@+id/table_card4"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/my_hand2"
-        android:layout_width="50dp"
-        android:layout_height="70dp"
-        android:layout_margin="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        <ImageView
+            android:id="@+id/table_card4"
+            android:layout_width="60dp"
+            android:layout_height="90dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/gray_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/table_card3"
+            app:layout_constraintRight_toLeftOf="@+id/table_card5"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/table_card5"
+            android:layout_width="60dp"
+            android:layout_height="90dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/gray_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/table_card4"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
 
     <!-- buttons -->
 
-    <Button
-        android:id="@+id/foul"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/my_layout"
+        app:layout_constraintTop_toBottomOf="@id/table_cards_layout">
 
-    <Button
-        android:id="@+id/call"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/fold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="@string/fold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/call" />
 
-    <Button
-        android:id="@+id/raise"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="@string/call"
+            app:layout_constraintLeft_toRightOf="@+id/fold"
+            app:layout_constraintRight_toLeftOf="@+id/raise" />
+
+        <Button
+            android:id="@+id/raise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="@string/raise"
+            app:layout_constraintLeft_toRightOf="@+id/call"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <!--<SeekBar-->
+        <!--android:id="@+id/raise_value"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:visibility="invisible"-->
+        <!--tools:visibility="visible"-->
+        <!--android:layout_height="wrap_content" />-->
+
+
+    </android.support.constraint.ConstraintLayout>
+
+    <!-- my cards -->
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/my_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttons_layout">
+
+        <ImageView
+            android:id="@+id/my_hand1"
+            android:layout_width="60dp"
+            android:layout_height="90dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/gray_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/my_hand2"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/my_hand2"
+            android:layout_width="60dp"
+            android:layout_height="90dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/gray_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/my_hand1"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/my_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="@string/you"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/my_money"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/my_money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/my_text"
+            tools:text="$20000" />
+
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>
