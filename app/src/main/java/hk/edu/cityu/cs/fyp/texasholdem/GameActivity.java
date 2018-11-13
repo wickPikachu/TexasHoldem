@@ -3,6 +3,7 @@ package hk.edu.cityu.cs.fyp.texasholdem;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +24,15 @@ public class GameActivity extends AppCompatActivity {
             R.id.table_card5,
     })
     List<ImageView> tableCards;
+
+    @BindView(R.id.fold)
+    Button foldButton;
+
+    @BindView(R.id.raise)
+    Button raiseButton;
+
+    @BindView(R.id.call)
+    Button callButton;
 
     @BindView(R.id.my_hand1)
     ImageView myHand1;
@@ -45,11 +55,17 @@ public class GameActivity extends AppCompatActivity {
     @BindView(R.id.round)
     TextView roundText;
 
+    boolean myTurn = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         ButterKnife.bind(this);
+
+        // TODO: update init state;;
+        myTurn = true;
+        updateUI();
 
         roundText.setText("Round: 1");
 
@@ -64,10 +80,16 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+    private void updateUI() {
+        foldButton.setEnabled(myTurn);
+        callButton.setEnabled(myTurn);
+        raiseButton.setEnabled(myTurn);
+    }
+
     @OnClick({
             R.id.fold,
             R.id.call,
-            R.id.raise
+            R.id.raise,
     })
     public void onButtonClicked(View view) {
         switch (view.getId()) {
@@ -76,6 +98,7 @@ public class GameActivity extends AppCompatActivity {
             case R.id.call:
                 break;
             case R.id.raise:
+                // TODO: view raise bar
                 break;
         }
     }
