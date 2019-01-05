@@ -13,6 +13,7 @@ import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -55,6 +56,7 @@ public class GameActivity extends AppCompatActivity {
     @BindView(R.id.round)
     TextView roundText;
 
+    // player turn
     boolean myTurn = false;
 
     @Override
@@ -75,8 +77,8 @@ public class GameActivity extends AppCompatActivity {
         opponentMoneyText.setText("$19800");
         opponentBetsMoneyText.setText("Bet: $200");
 
-        myHand1.setImageResource(R.drawable.c8);
-        myHand2.setImageResource(R.drawable.sk);
+        myHand1.setImageResource(Utils.getDrawableResByString(this, "c9"));
+        myHand2.setImageResource(Utils.getDrawableResByString(this, "s10"));
 
     }
 
