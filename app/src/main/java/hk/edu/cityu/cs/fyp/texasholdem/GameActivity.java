@@ -14,6 +14,7 @@ import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
+import hk.edu.cityu.cs.fyp.texasholdem.model.Model;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -56,8 +57,7 @@ public class GameActivity extends AppCompatActivity {
     @BindView(R.id.round)
     TextView roundText;
 
-    // player turn
-    boolean myTurn = false;
+    Model model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,27 +65,29 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
         ButterKnife.bind(this);
 
-        // TODO: update init state;;
-        myTurn = true;
+        model = Model.getInstance();
+        model.init();
+
+        model.startRound();
         updateUI();
-
-        roundText.setText("Round: 1");
-
-        myMoneyText.setText("$19900");
-        myBetsMoneyText.setText("Bet: $100");
-
-        opponentMoneyText.setText("$19800");
-        opponentBetsMoneyText.setText("Bet: $200");
-
-        myHand1.setImageResource(Utils.getDrawableResByString(this, "c9"));
-        myHand2.setImageResource(Utils.getDrawableResByString(this, "s10"));
-
     }
 
     private void updateUI() {
-        foldButton.setEnabled(myTurn);
-        callButton.setEnabled(myTurn);
-        raiseButton.setEnabled(myTurn);
+        boolean isPlayerTurn = model.isPlayerTurn();
+        foldButton.setEnabled(isPlayerTurn);
+        callButton.setEnabled(isPlayerTurn);
+        raiseButton.setEnabled(isPlayerTurn);
+
+        roundText.setText(String.format("Round: %d", model.getRounds()));
+
+        myMoneyText.setText("$" + model.getPlayerMoney());
+        myBetsMoneyText.setText("Bet: $" + model.getPlayerBets());
+
+        opponentMoneyText.setText("$" + model.getOpponentMoney());
+        opponentBetsMoneyText.setText("Bet: $" + model.getOpponentBets());
+
+        myHand1.setImageResource(Utils.getDrawableResByString(this, "c9"));
+        myHand2.setImageResource(Utils.getDrawableResByString(this, "s10"));
     }
 
     @OnClick({
@@ -96,13 +98,18 @@ public class GameActivity extends AppCompatActivity {
     public void onButtonClicked(View view) {
         switch (view.getId()) {
             case R.id.fold:
+                model.playerFold();
                 break;
             case R.id.call:
+                model.playerCall();
                 break;
             case R.id.raise:
                 // TODO: view raise bar
+                int raiseBets = 0;
+                model.playerRaise(raiseBets);
                 break;
         }
+        updateUI();
     }
 
 
