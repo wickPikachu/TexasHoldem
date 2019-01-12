@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -86,8 +87,9 @@ public class GameActivity extends AppCompatActivity {
         opponentMoneyText.setText("$" + model.getOpponentMoney());
         opponentBetsMoneyText.setText("Bet: $" + model.getOpponentBets());
 
-        myHand1.setImageResource(Utils.getDrawableResByString(this, "c9"));
-        myHand2.setImageResource(Utils.getDrawableResByString(this, "s10"));
+        ArrayList<String> playerCards = model.getPlayerCardList();
+        myHand1.setImageResource(Utils.getDrawableResByString(this, playerCards.get(0)));
+        myHand2.setImageResource(Utils.getDrawableResByString(this, playerCards.get(1)));
     }
 
     @OnClick({
