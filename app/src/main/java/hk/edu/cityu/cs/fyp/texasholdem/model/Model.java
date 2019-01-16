@@ -55,7 +55,7 @@ public class Model {
         totalBets = 0;
         playerMoney = 20000;
         playerBets = 0;
-        opponentMoney = 2000;
+        opponentMoney = 20000;
         opponentBets = 0;
     }
 

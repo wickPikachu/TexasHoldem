@@ -66,6 +66,8 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
         ButterKnife.bind(this);
 
+        // TODO: view model to control DB
+
         model = Model.getInstance();
         model.init();
 

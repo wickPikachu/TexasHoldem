@@ -81,7 +81,6 @@
 
     <!-- table cards  -->
 
-
     <android.support.constraint.ConstraintLayout
         android:id="@+id/table_cards_layout"
         android:layout_width="match_parent"
