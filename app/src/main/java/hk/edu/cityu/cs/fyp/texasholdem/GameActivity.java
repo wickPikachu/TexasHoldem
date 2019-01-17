@@ -1,5 +1,7 @@
 package hk.edu.cityu.cs.fyp.texasholdem;
 
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -15,7 +17,8 @@ import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
-import hk.edu.cityu.cs.fyp.texasholdem.model.Model;
+import hk.edu.cityu.cs.fyp.texasholdem.model.TexasHoldem;
+import hk.edu.cityu.cs.fyp.texasholdem.viewmodel.GameViewModel;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -58,7 +61,8 @@ public class GameActivity extends AppCompatActivity {
     @BindView(R.id.round)
     TextView roundText;
 
-    Model model;
+    GameViewModel gameViewModel;
+    TexasHoldem texasHoldem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,30 +70,31 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
         ButterKnife.bind(this);
 
-        // TODO: view model to control DB
+        // TODO: view texasHoldem to control DB
+        gameViewModel = ViewModelProviders.of(this).get(GameViewModel.class);
 
-        model = Model.getInstance();
-        model.init();
+        texasHoldem = TexasHoldem.getInstance();
+        texasHoldem.init();
 
-        model.startRound();
+        texasHoldem.startRound();
         updateUI();
     }
 
     private void updateUI() {
-        boolean isPlayerTurn = model.isPlayerTurn();
+        boolean isPlayerTurn = texasHoldem.isPlayerTurn();
         foldButton.setEnabled(isPlayerTurn);
         callButton.setEnabled(isPlayerTurn);
         raiseButton.setEnabled(isPlayerTurn);
 
-        roundText.setText(String.format("Round: %d", model.getRounds()));
+        roundText.setText(String.format("Round: %d", texasHoldem.getRounds()));
 
-        myMoneyText.setText("$" + model.getPlayerMoney());
-        myBetsMoneyText.setText("Bet: $" + model.getPlayerBets());
+        myMoneyText.setText("$" + texasHoldem.getPlayerMoney());
+        myBetsMoneyText.setText("Bet: $" + texasHoldem.getPlayerBets());
 
-        opponentMoneyText.setText("$" + model.getOpponentMoney());
-        opponentBetsMoneyText.setText("Bet: $" + model.getOpponentBets());
+        opponentMoneyText.setText("$" + texasHoldem.getOpponentMoney());
+        opponentBetsMoneyText.setText("Bet: $" + texasHoldem.getOpponentBets());
 
-        ArrayList<String> playerCards = model.getPlayerCardList();
+        ArrayList<String> playerCards = texasHoldem.getPlayerCardList();
         myHand1.setImageResource(Utils.getDrawableResByString(this, playerCards.get(0)));
         myHand2.setImageResource(Utils.getDrawableResByString(this, playerCards.get(1)));
     }
@@ -102,15 +107,15 @@ public class GameActivity extends AppCompatActivity {
     public void onButtonClicked(View view) {
         switch (view.getId()) {
             case R.id.fold:
-                model.playerFold();
+                texasHoldem.playerFold();
                 break;
             case R.id.call:
-                model.playerCall();
+                texasHoldem.playerCall();
                 break;
             case R.id.raise:
                 // TODO: view raise bar
                 int raiseBets = 0;
-                model.playerRaise(raiseBets);
+                texasHoldem.playerRaise(raiseBets);
                 break;
         }
         updateUI();

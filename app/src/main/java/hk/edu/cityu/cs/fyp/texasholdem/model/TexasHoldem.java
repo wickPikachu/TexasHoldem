@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Stack;
 
-public class Model {
+public class TexasHoldem {
 
     public static final int BUILD_BET = 200;
     public static final int ROUNDS_LIMIT = 20;
 
-    private static final Model ourInstance = new Model();
+    private static final TexasHoldem ourInstance = new TexasHoldem();
 
     private ArrayList<String> playerCardList = new ArrayList<>();
 
@@ -35,11 +35,11 @@ public class Model {
 
     private String history;
 
-    public static Model getInstance() {
+    public static TexasHoldem getInstance() {
         return ourInstance;
     }
 
-    private Model() {
+    private TexasHoldem() {
     }
 
     /**
