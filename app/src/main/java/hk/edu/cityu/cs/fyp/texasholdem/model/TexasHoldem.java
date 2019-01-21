@@ -22,7 +22,7 @@ public class TexasHoldem {
     private boolean isPlayerBuildBets;
     private boolean isPlayerTurn;
     private int rounds;
-
+    private String message;
     private int totalBets;
 
     private int playerMoney;
@@ -69,6 +69,7 @@ public class TexasHoldem {
 
         rounds += 1;
         isPlayerBuildBets = !isPlayerBuildBets;
+        message = "Round Start";
         // TODO: change who action first
 
         String[] cardClass = {"c", "d", "h", "s"};
@@ -160,5 +161,9 @@ public class TexasHoldem {
 
     public boolean isPlayerBuildBets() {
         return isPlayerBuildBets;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

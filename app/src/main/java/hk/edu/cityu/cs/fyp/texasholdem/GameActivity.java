@@ -1,12 +1,13 @@
 package hk.edu.cityu.cs.fyp.texasholdem;
 
-import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProviders;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -61,6 +62,15 @@ public class GameActivity extends AppCompatActivity {
     @BindView(R.id.round)
     TextView roundText;
 
+    @BindView(R.id.raise_bets_edit)
+    EditText raiseBetsEditText;
+
+    @BindView(R.id.raise_value_bar)
+    SeekBar raiseValueSeekBar;
+
+    @BindView(R.id.message)
+    TextView messageView;
+
     GameViewModel gameViewModel;
     TexasHoldem texasHoldem;
 
@@ -76,6 +86,7 @@ public class GameActivity extends AppCompatActivity {
         texasHoldem = TexasHoldem.getInstance();
         texasHoldem.init();
 
+        raiseValueSeekBar.setOnSeekBarChangeListener(onRaiseValueSeekBarChangeListener);
         texasHoldem.startRound();
         updateUI();
     }
@@ -97,6 +108,7 @@ public class GameActivity extends AppCompatActivity {
         ArrayList<String> playerCards = texasHoldem.getPlayerCardList();
         myHand1.setImageResource(Utils.getDrawableResByString(this, playerCards.get(0)));
         myHand2.setImageResource(Utils.getDrawableResByString(this, playerCards.get(1)));
+        messageView.setText(texasHoldem.getMessage());
     }
 
     @OnClick({
@@ -113,13 +125,26 @@ public class GameActivity extends AppCompatActivity {
                 texasHoldem.playerCall();
                 break;
             case R.id.raise:
-                // TODO: view raise bar
-                int raiseBets = 0;
+                int raiseBets = Integer.parseInt(raiseBetsEditText.getText().toString());
                 texasHoldem.playerRaise(raiseBets);
                 break;
         }
         updateUI();
     }
 
+    private SeekBar.OnSeekBarChangeListener onRaiseValueSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            // TODO: change raise bet
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
+    };
 
 }

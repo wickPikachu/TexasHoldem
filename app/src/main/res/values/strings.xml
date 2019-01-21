@@ -9,5 +9,6 @@
     <string name="round">Round</string>
     <string name="you">You:</string>
     <string name="opponent">Opponent:</string>
+    <string name="raise_">Raise:</string>
 
 </resources>
