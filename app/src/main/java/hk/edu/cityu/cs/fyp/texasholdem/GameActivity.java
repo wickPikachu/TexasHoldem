@@ -109,6 +109,8 @@ public class GameActivity extends AppCompatActivity {
         myHand1.setImageResource(Utils.getDrawableResByString(this, playerCards.get(0)));
         myHand2.setImageResource(Utils.getDrawableResByString(this, playerCards.get(1)));
         messageView.setText(texasHoldem.getMessage());
+        // default $200 in raise editText
+        raiseBetsEditText.setText("200");
     }
 
     @OnClick({

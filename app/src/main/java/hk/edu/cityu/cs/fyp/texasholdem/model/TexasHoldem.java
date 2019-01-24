@@ -72,11 +72,9 @@ public class TexasHoldem {
         message = "Round Start";
         // TODO: change who action first
 
-        String[] cardClass = {"c", "d", "h", "s"};
-        String[] cardNumbers = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k", "a"};
-        for (String c : cardClass) {
-            for (String n : cardNumbers) {
-                deck.add(c + n);
+        for (char c : CardDecisions.cardClassList) {
+            for (char n : CardDecisions.cardNumberList) {
+                deck.add("" + c + n);
             }
         }
         Collections.shuffle(deck);
