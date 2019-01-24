@@ -17,6 +17,7 @@ import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 import hk.edu.cityu.cs.fyp.texasholdem.model.TexasHoldem;
 import hk.edu.cityu.cs.fyp.texasholdem.viewmodel.GameViewModel;
@@ -128,9 +129,14 @@ public class GameActivity extends AppCompatActivity {
                 break;
             case R.id.raise:
                 int raiseBets = Integer.parseInt(raiseBetsEditText.getText().toString());
-                texasHoldem.playerRaise(raiseBets);
+                try {
+                    texasHoldem.playerRaise(raiseBets);
+                } catch (TexasHoldemException e) {
+                    updateUI();
+                }
                 break;
         }
+
         updateUI();
     }
 

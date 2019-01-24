@@ -38,8 +38,8 @@ public class TexasHoldem {
     private int opponentBets;
     private boolean opponentAction;
 
-    private String actionHistroy;
-    private String cardHistroy;
+    private String actionHistory;
+    private String cardHistory;
     private String betsResult;
 
     public static TexasHoldem getInstance() {
@@ -56,7 +56,7 @@ public class TexasHoldem {
     public void init() {
         isPlayerTurn = true;
         isPlayerBuildBets = false;
-        actionHistroy = "";
+        actionHistory = "";
 
         rounds = -1;
         totalBets = 0;
@@ -107,7 +107,7 @@ public class TexasHoldem {
     }
 
     public void nextTurn() {
-        actionHistroy += "/";
+        actionHistory += "/";
 
     }
 
@@ -115,15 +115,16 @@ public class TexasHoldem {
      * Round end
      */
     public void endRound() {
-        // TODO: add actionHistroy to DB
-        actionHistroy += "";
+        // TODO: add actionHistory to DB
+        actionHistory += "";
     }
 
     public void playerRaise(int raiseBets) throws TexasHoldemException {
         if (playerMoney < raiseBets) {
-            throw new TexasHoldemException("");
+            message = "Your money do not enough";
+            throw new TexasHoldemException(message);
         }
-        actionHistroy += "b" + raiseBets;
+        actionHistory += "b" + raiseBets;
     }
 
     public void playerFold() {
@@ -132,7 +133,7 @@ public class TexasHoldem {
     }
 
     public void playerCall() {
-        actionHistroy += "c";
+        actionHistory += "c";
     }
 
     public void opponentRaise(int raiseBets) {
@@ -142,6 +143,10 @@ public class TexasHoldem {
     public void opponentFold() {
         playerMoney += totalBets;
         endRound();
+    }
+
+    public void opponentCall() {
+        actionHistory += "c";
     }
 
     // Getters
@@ -193,4 +198,5 @@ public class TexasHoldem {
     public String getMessage() {
         return message;
     }
+
 }
