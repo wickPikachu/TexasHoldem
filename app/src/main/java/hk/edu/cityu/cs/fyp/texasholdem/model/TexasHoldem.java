@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Stack;
 
+import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
+
 public class TexasHoldem {
 
     public static final int BUILD_BET = 200;
-    public static final int ROUNDS_LIMIT = 20;
+    public static final int ROUNDS_LIMIT = 50;
 
     private static final TexasHoldem ourInstance = new TexasHoldem();
 
@@ -21,8 +23,11 @@ public class TexasHoldem {
 
     private boolean isPlayerBuildBets;
     private boolean isPlayerTurn;
+    // init = -1, start from 0
     private int rounds;
     private String message;
+
+
     private int totalBets;
 
     private int playerMoney;
@@ -33,7 +38,9 @@ public class TexasHoldem {
     private int opponentBets;
     private boolean opponentAction;
 
-    private String history;
+    private String actionHistroy;
+    private String cardHistroy;
+    private String betsResult;
 
     public static TexasHoldem getInstance() {
         return ourInstance;
@@ -49,9 +56,9 @@ public class TexasHoldem {
     public void init() {
         isPlayerTurn = true;
         isPlayerBuildBets = false;
-        history = "";
+        actionHistroy = "";
 
-        rounds = 0;
+        rounds = -1;
         totalBets = 0;
         playerMoney = 20000;
         playerBets = 0;
@@ -70,7 +77,19 @@ public class TexasHoldem {
         rounds += 1;
         isPlayerBuildBets = !isPlayerBuildBets;
         message = "Round Start";
+
         // TODO: change who action first
+        if (isPlayerBuildBets) {
+            playerBets = BUILD_BET;
+            playerAction = false;
+            opponentAction = true;
+            opponentBets = BUILD_BET / 2;
+        } else {
+            playerBets = BUILD_BET / 2;
+            playerAction = true;
+            opponentAction = false;
+            opponentBets = BUILD_BET;
+        }
 
         for (char c : CardDecisions.cardClassList) {
             for (char n : CardDecisions.cardNumberList) {
@@ -84,17 +103,27 @@ public class TexasHoldem {
             playerCardList.add(deck.pop());
             opponentCardList.add(deck.pop());
         }
+
+    }
+
+    public void nextTurn() {
+        actionHistroy += "/";
+
     }
 
     /**
      * Round end
      */
     public void endRound() {
-        // TODO: add history to DB
+        // TODO: add actionHistroy to DB
+        actionHistroy += "";
     }
 
-    public void playerRaise(int raiseBets) {
-
+    public void playerRaise(int raiseBets) throws TexasHoldemException {
+        if (playerMoney < raiseBets) {
+            throw new TexasHoldemException("");
+        }
+        actionHistroy += "b" + raiseBets;
     }
 
     public void playerFold() {
@@ -103,7 +132,7 @@ public class TexasHoldem {
     }
 
     public void playerCall() {
-
+        actionHistroy += "c";
     }
 
     public void opponentRaise(int raiseBets) {
