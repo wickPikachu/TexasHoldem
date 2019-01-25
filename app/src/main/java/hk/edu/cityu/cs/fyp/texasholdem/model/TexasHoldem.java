@@ -8,7 +8,7 @@ import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
 
 public class TexasHoldem {
 
-    public static final int BUILD_BET = 200;
+    public static final int BIG_BLIND_BET = 200;
     public static final int ROUNDS_LIMIT = 50;
 
     private static final TexasHoldem ourInstance = new TexasHoldem();
@@ -22,7 +22,8 @@ public class TexasHoldem {
     private Stack<String> deck = new Stack<>();
 
     private boolean isPlayerBuildBets;
-    private boolean isPlayerTurn;
+    // this round is player action first (opponent is big blind bets)
+    private boolean isPlayerFirst;
     // init = -1, start from 0
     private int rounds;
     // init = 0, start from 1
@@ -56,7 +57,7 @@ public class TexasHoldem {
      * init player and opponent money
      */
     public void init() {
-        isPlayerTurn = true;
+        isPlayerFirst = true;
         isPlayerBuildBets = false;
         actionHistory = "";
 
@@ -83,15 +84,15 @@ public class TexasHoldem {
 
         // TODO: change who action first
         if (isPlayerBuildBets) {
-            playerBets = BUILD_BET;
+            playerBets = BIG_BLIND_BET;
             isPlayerAction = false;
             isOpponentAction = true;
-            opponentBets = BUILD_BET / 2;
+            opponentBets = BIG_BLIND_BET / 2;
         } else {
-            playerBets = BUILD_BET / 2;
+            playerBets = BIG_BLIND_BET / 2;
             isPlayerAction = true;
             isOpponentAction = false;
-            opponentBets = BUILD_BET;
+            opponentBets = BIG_BLIND_BET;
         }
 
         for (char c : CardDecisions.cardClassList) {
@@ -109,8 +110,16 @@ public class TexasHoldem {
 
     }
 
-    public void next(){
-
+    public void next() {
+        if (tableCardList.isEmpty()) {
+            tableCardList.add(deck.pop());
+            tableCardList.add(deck.pop());
+            tableCardList.add(deck.pop());
+        } else if (tableCardList.size() == 5) {
+            // TODO: decision who are winner
+        } else {    // table cards size is 3 or 4
+            tableCardList.add(deck.pop());
+        }
     }
 
     public void nextTurn() {
@@ -142,6 +151,7 @@ public class TexasHoldem {
 
     public void playerCall() {
         actionHistory += "c";
+        isPlayerAction = false;
     }
 
     public void opponentRaise(int raiseBets) throws TexasHoldemException {
@@ -160,9 +170,10 @@ public class TexasHoldem {
 
     public void opponentCall() {
         actionHistory += "c";
+        isOpponentAction = false;
     }
 
-    public void takeAction(AIPlayer aiPlayer){
+    public void takeAction(AIPlayer aiPlayer) {
         aiPlayer.takeAction(this);
     }
 
@@ -184,8 +195,8 @@ public class TexasHoldem {
 
     // Getters
 
-    public boolean isPlayerTurn() {
-        return isPlayerTurn;
+    public boolean isPlayerFirst() {
+        return isPlayerFirst;
     }
 
     public int getRounds() {

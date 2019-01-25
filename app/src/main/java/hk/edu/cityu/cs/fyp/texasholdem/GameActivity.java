@@ -102,7 +102,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        boolean isPlayerTurn = texasHoldem.isPlayerTurn();
+        boolean isPlayerTurn = texasHoldem.isPlayerFirst();
         if (isPlayerTurn) {
             foldButton.setEnabled(true);
             callButton.setEnabled(true);
