@@ -8,7 +8,7 @@ public class MiniMaxAIPlayer extends AIPlayer {
 
     @Override
     public void takeAction(TexasHoldem texasHoldem) {
-
+        // TODO: actions
     }
 
 }

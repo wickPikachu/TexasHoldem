@@ -2,12 +2,14 @@ package hk.edu.cityu.cs.fyp.texasholdem.model;
 
 import java.util.Random;
 
+import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
+
 public class RandomAIPlayer extends AIPlayer {
 
     private Random random;
 
     public RandomAIPlayer() {
-        this.random = new Random(100);
+        this.random = new Random();
     }
 
     public RandomAIPlayer(int randomSeed) {
@@ -20,7 +22,11 @@ public class RandomAIPlayer extends AIPlayer {
             case 0:
                 texasHoldem.opponentFold();
             case 1:
-                texasHoldem.opponentRaise((random.nextInt(texasHoldem.getOpponentMoney() / 100 - 1) + 1) * 100);
+                try {
+                    texasHoldem.opponentRaise((random.nextInt(texasHoldem.getOpponentMoney() / 100 - 1) + 1) * 100);
+                } catch (TexasHoldemException e) {
+                    e.printStackTrace();
+                }
             case 2:
                 texasHoldem.opponentCall();
         }

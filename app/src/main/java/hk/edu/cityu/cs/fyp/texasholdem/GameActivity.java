@@ -19,6 +19,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
+import hk.edu.cityu.cs.fyp.texasholdem.model.AIPlayer;
+import hk.edu.cityu.cs.fyp.texasholdem.model.RandomAIPlayer;
 import hk.edu.cityu.cs.fyp.texasholdem.model.TexasHoldem;
 import hk.edu.cityu.cs.fyp.texasholdem.viewmodel.GameViewModel;
 
@@ -74,6 +76,7 @@ public class GameActivity extends AppCompatActivity {
 
     GameViewModel gameViewModel;
     TexasHoldem texasHoldem;
+    AIPlayer aiPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,8 +84,14 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
         ButterKnife.bind(this);
 
+        // TODO: from shared preference get AI player level
+        aiPlayer = new RandomAIPlayer();
+
         // TODO: view texasHoldem to control DB
         gameViewModel = ViewModelProviders.of(this).get(GameViewModel.class);
+
+        // default $200 in raise editText
+        raiseBetsEditText.setText("200");
 
         texasHoldem = TexasHoldem.getInstance();
         texasHoldem.init();
@@ -94,9 +103,17 @@ public class GameActivity extends AppCompatActivity {
 
     private void updateUI() {
         boolean isPlayerTurn = texasHoldem.isPlayerTurn();
-        foldButton.setEnabled(isPlayerTurn);
-        callButton.setEnabled(isPlayerTurn);
-        raiseButton.setEnabled(isPlayerTurn);
+        if (isPlayerTurn) {
+            foldButton.setEnabled(true);
+            callButton.setEnabled(true);
+            raiseButton.setEnabled(true);
+        } else { // AIPlayer turn
+            foldButton.setEnabled(false);
+            callButton.setEnabled(false);
+            raiseButton.setEnabled(false);
+            // AIPlayer actions
+            texasHoldem.takeAction(aiPlayer);
+        }
 
         roundText.setText(String.format("Round: %d", texasHoldem.getRounds()));
 
@@ -110,8 +127,6 @@ public class GameActivity extends AppCompatActivity {
         myHand1.setImageResource(Utils.getDrawableResByString(this, playerCards.get(0)));
         myHand2.setImageResource(Utils.getDrawableResByString(this, playerCards.get(1)));
         messageView.setText(texasHoldem.getMessage());
-        // default $200 in raise editText
-        raiseBetsEditText.setText("200");
     }
 
     @OnClick({

@@ -25,6 +25,8 @@ public class TexasHoldem {
     private boolean isPlayerTurn;
     // init = -1, start from 0
     private int rounds;
+    // init = 0, start from 1
+    private int turn;
     private String message;
 
 
@@ -32,11 +34,11 @@ public class TexasHoldem {
 
     private int playerMoney;
     private int playerBets;
-    private boolean playerAction;
+    private boolean isPlayerAction;
 
     private int opponentMoney;
     private int opponentBets;
-    private boolean opponentAction;
+    private boolean isOpponentAction;
 
     private String actionHistory;
     private String cardHistory;
@@ -59,6 +61,7 @@ public class TexasHoldem {
         actionHistory = "";
 
         rounds = -1;
+        turn = 0;
         totalBets = 0;
         playerMoney = 20000;
         playerBets = 0;
@@ -81,13 +84,13 @@ public class TexasHoldem {
         // TODO: change who action first
         if (isPlayerBuildBets) {
             playerBets = BUILD_BET;
-            playerAction = false;
-            opponentAction = true;
+            isPlayerAction = false;
+            isOpponentAction = true;
             opponentBets = BUILD_BET / 2;
         } else {
             playerBets = BUILD_BET / 2;
-            playerAction = true;
-            opponentAction = false;
+            isPlayerAction = true;
+            isOpponentAction = false;
             opponentBets = BUILD_BET;
         }
 
@@ -106,9 +109,13 @@ public class TexasHoldem {
 
     }
 
+    public void next(){
+
+    }
+
     public void nextTurn() {
         actionHistory += "/";
-
+        ++turn;
     }
 
     /**
@@ -128,6 +135,7 @@ public class TexasHoldem {
     }
 
     public void playerFold() {
+        actionHistory += "f";
         opponentMoney += totalBets;
         endRound();
     }
@@ -136,17 +144,42 @@ public class TexasHoldem {
         actionHistory += "c";
     }
 
-    public void opponentRaise(int raiseBets) {
-
+    public void opponentRaise(int raiseBets) throws TexasHoldemException {
+        if (opponentMoney < raiseBets) {
+            message = "Opponent money do not enough";
+            throw new TexasHoldemException(message);
+        }
+        actionHistory += "b" + raiseBets;
     }
 
     public void opponentFold() {
+        actionHistory += "f";
         playerMoney += totalBets;
         endRound();
     }
 
     public void opponentCall() {
         actionHistory += "c";
+    }
+
+    public void takeAction(AIPlayer aiPlayer){
+        aiPlayer.takeAction(this);
+    }
+
+    private void playerWin() {
+        playerBets += totalBets;
+        endRound();
+    }
+
+    private void playerLose() {
+        opponentBets += totalBets;
+        endRound();
+    }
+
+    private void playerDraw() {
+        playerBets += totalBets / 2;
+        opponentBets += totalBets / 2;
+        endRound();
     }
 
     // Getters
