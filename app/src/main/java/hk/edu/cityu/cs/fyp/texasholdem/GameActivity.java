@@ -53,11 +53,11 @@ public class GameActivity extends AppCompatActivity {
     @BindView(R.id.my_money)
     TextView myMoneyText;
 
-    @BindView(R.id.opponent_money)
-    TextView opponentMoneyText;
+    @BindView(R.id.computer_money)
+    TextView computerMoneyText;
 
-    @BindView(R.id.opponent_bets_money)
-    TextView opponentBetsMoneyText;
+    @BindView(R.id.computer_bets_money)
+    TextView computerBetsMoneyText;
 
     @BindView(R.id.my_bets_money)
     TextView myBetsMoneyText;
@@ -102,16 +102,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        boolean isPlayerTurn = texasHoldem.isPlayerFirst();
-        if (isPlayerTurn) {
-            foldButton.setEnabled(true);
-            callButton.setEnabled(true);
-            raiseButton.setEnabled(true);
-        } else { // AIPlayer turn
-            foldButton.setEnabled(false);
-            callButton.setEnabled(false);
-            raiseButton.setEnabled(false);
-            // AIPlayer actions
+        // AIPlayer turn
+        if (!texasHoldem.isPlayerTurn()) {
             texasHoldem.takeAction(aiPlayer);
         }
 
@@ -120,13 +112,22 @@ public class GameActivity extends AppCompatActivity {
         myMoneyText.setText("$" + texasHoldem.getPlayerMoney());
         myBetsMoneyText.setText("Bet: $" + texasHoldem.getPlayerBets());
 
-        opponentMoneyText.setText("$" + texasHoldem.getOpponentMoney());
-        opponentBetsMoneyText.setText("Bet: $" + texasHoldem.getOpponentBets());
+        computerMoneyText.setText("$" + texasHoldem.getComputerMoney());
+        computerBetsMoneyText.setText("Bet: $" + texasHoldem.getComputerBets());
 
         ArrayList<String> playerCards = texasHoldem.getPlayerCardList();
         myHand1.setImageResource(Utils.getDrawableResByString(this, playerCards.get(0)));
         myHand2.setImageResource(Utils.getDrawableResByString(this, playerCards.get(1)));
         messageView.setText(texasHoldem.getMessage());
+
+        ArrayList<String> tableCardList = texasHoldem.getTableCardList();
+        for (int i = 0; i < tableCardList.size(); i++) {
+            tableCards.get(i).setImageResource(Utils.getDrawableResByString(this, tableCardList.get(i)));
+        }
+
+        foldButton.setEnabled(texasHoldem.canPlayerFold());
+        callButton.setEnabled(texasHoldem.canPlayerCall());
+        raiseButton.setEnabled(texasHoldem.canPlayerRaise());
     }
 
     @OnClick({

@@ -8,7 +8,7 @@
     <string name="raise">Raise</string>
     <string name="round">Round</string>
     <string name="you">You:</string>
-    <string name="opponent">Opponent:</string>
+    <string name="computer">Computer:</string>
     <string name="raise_">Raise:</string>
 
 </resources>

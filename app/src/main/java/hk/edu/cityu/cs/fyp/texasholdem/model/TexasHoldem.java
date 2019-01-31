@@ -10,40 +10,48 @@ public class TexasHoldem {
 
     public static final int BIG_BLIND_BET = 200;
     public static final int ROUNDS_LIMIT = 50;
+    // bitwise for actions:
+    //      raise bit, call bit, fold bit
+    //          0         0         0
+    public static final int ACTION_FOLD_BIT = 1;
+    public static final int ACTION_CALL_BIT = 1 << 1;
+    public static final int ACTION_RAISE_BIT = 1 << 2;
 
     private static final TexasHoldem ourInstance = new TexasHoldem();
 
     private ArrayList<String> playerCardList = new ArrayList<>();
-
-    private ArrayList<String> opponentCardList = new ArrayList<>();
-
+    private ArrayList<String> computerCardList = new ArrayList<>();
     private ArrayList<String> tableCardList = new ArrayList<>();
-
     private Stack<String> deck = new Stack<>();
 
     private boolean isPlayerBuildBets;
-    // this round is player action first (opponent is big blind bets)
-    private boolean isPlayerFirst;
-    // init = -1, start from 0
+    // this round is player action first (computer is big blind bets)
+    private boolean isPlayerActionFirst;
+    // init = 0, start from 1
     private int rounds;
     // init = 0, start from 1
     private int turn;
     private String message;
 
+    // true = player, false = computer
+    private boolean isPlayerTurn;
 
     private int totalBets;
 
     private int playerMoney;
     private int playerBets;
-    private boolean isPlayerAction;
+    // bitwise
+    private int playerActionsBits;
 
-    private int opponentMoney;
-    private int opponentBets;
-    private boolean isOpponentAction;
+    private int computerMoney;
+    private int computerBets;
+    // bitwise
+    private int computerActionBits;
 
     private String actionHistory;
     private String cardHistory;
     private String betsResult;
+    private String gameLogResults;
 
     public static TexasHoldem getInstance() {
         return ourInstance;
@@ -54,20 +62,27 @@ public class TexasHoldem {
 
     /**
      * Game Start
-     * init player and opponent money
+     * init player, computer, and settings
      */
     public void init() {
-        isPlayerFirst = true;
-        isPlayerBuildBets = false;
+        isPlayerActionFirst = true;
+        isPlayerBuildBets = true;
         actionHistory = "";
+        cardHistory = "";
+        betsResult = "";
+        gameLogResults = "";
 
-        rounds = -1;
+        // fold is usually allow
+        playerActionsBits = 1;
+        computerActionBits = 1;
+
+        rounds = 0;
         turn = 0;
         totalBets = 0;
         playerMoney = 20000;
         playerBets = 0;
-        opponentMoney = 20000;
-        opponentBets = 0;
+        computerMoney = 20000;
+        computerBets = 0;
     }
 
     /**
@@ -75,25 +90,32 @@ public class TexasHoldem {
      */
     public void startRound() {
         playerCardList.clear();
-        opponentCardList.clear();
+        computerCardList.clear();
+        tableCardList.clear();
         deck.clear();
 
         rounds += 1;
         isPlayerBuildBets = !isPlayerBuildBets;
         message = "Round Start";
 
+        // allow raise and call
+        computerActionBits ^= 1 << 1;
+        computerActionBits ^= 1 << 2;
+        playerActionsBits ^= 1 << 1;
+        playerActionsBits ^= 1 << 2;
+
         // TODO: change who action first
         if (isPlayerBuildBets) {
             playerBets = BIG_BLIND_BET;
-            isPlayerAction = false;
-            isOpponentAction = true;
-            opponentBets = BIG_BLIND_BET / 2;
+            isPlayerTurn = false;
+            computerBets = BIG_BLIND_BET / 2;
         } else {
             playerBets = BIG_BLIND_BET / 2;
-            isPlayerAction = true;
-            isOpponentAction = false;
-            opponentBets = BIG_BLIND_BET;
+            isPlayerTurn = true;
+            computerBets = BIG_BLIND_BET;
         }
+        playerMoney -= playerBets;
+        computerMoney -= computerBets;
 
         for (char c : CardDecisions.cardClassList) {
             for (char n : CardDecisions.cardNumberList) {
@@ -105,7 +127,7 @@ public class TexasHoldem {
         // pop two cards to hand
         for (int i = 0; i < 2; i++) {
             playerCardList.add(deck.pop());
-            opponentCardList.add(deck.pop());
+            computerCardList.add(deck.pop());
         }
 
     }
@@ -120,6 +142,12 @@ public class TexasHoldem {
         } else {    // table cards size is 3 or 4
             tableCardList.add(deck.pop());
         }
+        playerActionsBits ^= 1 << 1;
+        playerActionsBits ^= 1 << 2;
+        computerActionBits ^= 1 << 1;
+        computerActionBits ^= 1 << 2;
+        actionHistory += "/";
+        ++turn;
     }
 
     public void nextTurn() {
@@ -131,8 +159,32 @@ public class TexasHoldem {
      * Round end
      */
     public void endRound() {
-        // TODO: add actionHistory to DB
         actionHistory += "";
+        gameLogResults += rounds + ":" + actionHistory + "|" + cardHistory + "|" + betsResult + "\n";
+
+        if (rounds < ROUNDS_LIMIT) {
+            startRound();
+        } else {
+            message = "All rounds finished";
+        }
+    }
+
+    public void playerFold() {
+        actionHistory += "f";
+        computerMoney += totalBets;
+        endRound();
+    }
+
+    public void playerCall() {
+        actionHistory += "c";
+        playerActionsBits ^= 1 << 1;
+        int diff = computerBets - playerBets;
+        if (diff > 0) {
+            playerBets += diff;
+            playerMoney -= diff;
+        }
+        isPlayerTurn = false;
+        next();
     }
 
     public void playerRaise(int raiseBets) throws TexasHoldemException {
@@ -140,37 +192,41 @@ public class TexasHoldem {
             message = "Your money do not enough";
             throw new TexasHoldemException(message);
         }
+        playerMoney -= raiseBets;
+        playerBets += raiseBets;
         actionHistory += "b" + raiseBets;
+        isPlayerTurn = false;
+        next();
     }
 
-    public void playerFold() {
-        actionHistory += "f";
-        opponentMoney += totalBets;
-        endRound();
-    }
-
-    public void playerCall() {
-        actionHistory += "c";
-        isPlayerAction = false;
-    }
-
-    public void opponentRaise(int raiseBets) throws TexasHoldemException {
-        if (opponentMoney < raiseBets) {
-            message = "Opponent money do not enough";
-            throw new TexasHoldemException(message);
-        }
-        actionHistory += "b" + raiseBets;
-    }
-
-    public void opponentFold() {
+    public void computerFold() {
         actionHistory += "f";
         playerMoney += totalBets;
         endRound();
     }
 
-    public void opponentCall() {
+    public void computerCall() {
         actionHistory += "c";
-        isOpponentAction = false;
+        computerActionBits ^= 1 << 1;
+        int diff = playerBets - computerBets;
+        if (diff > 0) {
+            computerBets += diff;
+            computerMoney -= diff;
+            isPlayerTurn = true;
+        }
+        next();
+    }
+
+    public void computerRaise(int raiseBets) throws TexasHoldemException {
+        if (computerMoney < raiseBets) {
+            message = "Computer money do not enough";
+            throw new TexasHoldemException(message);
+        }
+        computerMoney -= raiseBets;
+        computerBets += raiseBets;
+        actionHistory += "b" + raiseBets;
+        isPlayerTurn = true;
+        next();
     }
 
     public void takeAction(AIPlayer aiPlayer) {
@@ -183,20 +239,49 @@ public class TexasHoldem {
     }
 
     private void playerLose() {
-        opponentBets += totalBets;
+        computerBets += totalBets;
         endRound();
     }
 
     private void playerDraw() {
         playerBets += totalBets / 2;
-        opponentBets += totalBets / 2;
+        computerBets += totalBets / 2;
         endRound();
+    }
+
+    // TODO: use bitwise
+    public boolean canPlayerFold() {
+        return (playerActionsBits & 1) == 1;
+    }
+
+    public boolean canPlayerCall() {
+        return (playerActionsBits >> 1 & 1) == 1;
+    }
+
+    public boolean canPlayerRaise() {
+        return (playerActionsBits >> 2 & 1) == 1;
+    }
+
+    public boolean canComputerFold() {
+        return (computerActionBits & 1) == 1;
+    }
+
+    public boolean canComputerCall() {
+        return (computerActionBits >> 1 & 1) == 1;
+    }
+
+    public boolean canComputerRaise() {
+        return (computerActionBits >> 2 & 1) == 1;
     }
 
     // Getters
 
-    public boolean isPlayerFirst() {
-        return isPlayerFirst;
+    public String getGameLogResults() {
+        return gameLogResults;
+    }
+
+    public boolean isPlayerTurn() {
+        return isPlayerTurn;
     }
 
     public int getRounds() {
@@ -215,20 +300,20 @@ public class TexasHoldem {
         return playerBets;
     }
 
-    public int getOpponentMoney() {
-        return opponentMoney;
+    public int getComputerMoney() {
+        return computerMoney;
     }
 
-    public int getOpponentBets() {
-        return opponentBets;
+    public int getComputerBets() {
+        return computerBets;
     }
 
     public ArrayList<String> getPlayerCardList() {
         return playerCardList;
     }
 
-    public ArrayList<String> getOpponentCardList() {
-        return opponentCardList;
+    public ArrayList<String> getComputerCardList() {
+        return computerCardList;
     }
 
     public ArrayList<String> getTableCardList() {

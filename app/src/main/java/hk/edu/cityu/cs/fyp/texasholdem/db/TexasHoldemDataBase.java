@@ -4,10 +4,10 @@ import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 
 @Database(entities = {
-        Result.class
+        GameLog.class
 }, version = 1)
 public abstract class TexasHoldemDataBase extends RoomDatabase {
 
-    public abstract ResultDao getResultDao();
+    public abstract GameLogDao getResultDao();
 
 }

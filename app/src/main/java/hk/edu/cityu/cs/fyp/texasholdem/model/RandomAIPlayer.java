@@ -20,15 +20,15 @@ public class RandomAIPlayer extends AIPlayer {
     public void takeAction(TexasHoldem texasHoldem) {
         switch (random.nextInt(3)) {
             case 0:
-                texasHoldem.opponentFold();
+                texasHoldem.computerFold();
             case 1:
                 try {
-                    texasHoldem.opponentRaise((random.nextInt(texasHoldem.getOpponentMoney() / 100 - 1) + 1) * 100);
+                    texasHoldem.computerRaise((random.nextInt(texasHoldem.getComputerMoney() / 100 - 1) + 1) * 100);
                 } catch (TexasHoldemException e) {
                     e.printStackTrace();
                 }
             case 2:
-                texasHoldem.opponentCall();
+                texasHoldem.computerCall();
         }
     }
 }

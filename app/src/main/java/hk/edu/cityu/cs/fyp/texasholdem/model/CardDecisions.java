@@ -44,11 +44,12 @@ public class CardDecisions {
     //    A         K         Q         J         T         9      ...      3         2
     private long cards = 0;
 
+    // straight_flush, four of a kind, flush, straight, three of a kind, full house, two pairs, pairs
+    // 11111111
+    private int combinations = 0;
+
     public int getValues() {
         return 0;
-
-
-
     }
 
     public void addCard(String card) {

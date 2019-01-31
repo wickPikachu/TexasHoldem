@@ -9,14 +9,14 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 @Dao
-public interface ResultDao {
+public interface GameLogDao {
 
-    @Query("SELECT * FROM result WHERE is_sync = 0")
-    LiveData<List<Result>> findUnsyncResults();
+    @Query("SELECT * FROM GameLog WHERE is_sync = 0")
+    LiveData<List<GameLog>> findUnsyncResults();
 
     @Insert
-    void insertAll(Result... results);
+    void insertAll(GameLog... results);
 
     @Delete
-    void delete(Result result);
+    void delete(GameLog result);
 }
