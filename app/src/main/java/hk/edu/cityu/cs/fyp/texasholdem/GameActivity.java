@@ -103,8 +103,12 @@ public class GameActivity extends AppCompatActivity {
 
     private void updateUI() {
         // AIPlayer turn
-        if (!texasHoldem.isPlayerTurn()) {
+        if (texasHoldem.isComputerTurn()) {
             texasHoldem.takeAction(aiPlayer);
+        }
+
+        if (texasHoldem.isBothCalled()) {
+            texasHoldem.next();
         }
 
         roundText.setText(String.format("Round: %d", texasHoldem.getRounds()));
@@ -125,9 +129,11 @@ public class GameActivity extends AppCompatActivity {
             tableCards.get(i).setImageResource(Utils.getDrawableResByString(this, tableCardList.get(i)));
         }
 
-        foldButton.setEnabled(texasHoldem.canPlayerFold());
-        callButton.setEnabled(texasHoldem.canPlayerCall());
-        raiseButton.setEnabled(texasHoldem.canPlayerRaise());
+        if (texasHoldem.isPlayerTurn()) {
+            foldButton.setEnabled(true);
+            callButton.setEnabled(true);
+            raiseButton.setEnabled(true);
+        }
     }
 
     @OnClick({
@@ -148,7 +154,7 @@ public class GameActivity extends AppCompatActivity {
                 try {
                     texasHoldem.playerRaise(raiseBets);
                 } catch (TexasHoldemException e) {
-                    updateUI();
+                    e.printStackTrace();
                 }
                 break;
         }

@@ -33,8 +33,17 @@ public class TexasHoldem {
     private int turn;
     private String message;
 
-    // true = player, false = computer
-    private boolean isPlayerTurn;
+    enum GameState {
+        PlayerTurn,
+        PlayerCalled,
+        PlayerRaised,
+        ComputerTurn,
+        ComputerCalled,
+        ComputerRaised,
+        BothCalled
+    }
+
+    private GameState gameState;
 
     private int totalBets;
 
@@ -107,11 +116,11 @@ public class TexasHoldem {
         // TODO: change who action first
         if (isPlayerBuildBets) {
             playerBets = BIG_BLIND_BET;
-            isPlayerTurn = false;
+            gameState = GameState.ComputerTurn;
             computerBets = BIG_BLIND_BET / 2;
         } else {
             playerBets = BIG_BLIND_BET / 2;
-            isPlayerTurn = true;
+            gameState = GameState.PlayerTurn;
             computerBets = BIG_BLIND_BET;
         }
         playerMoney -= playerBets;
@@ -150,11 +159,6 @@ public class TexasHoldem {
         ++turn;
     }
 
-    public void nextTurn() {
-        actionHistory += "/";
-        ++turn;
-    }
-
     /**
      * Round end
      */
@@ -178,13 +182,17 @@ public class TexasHoldem {
     public void playerCall() {
         actionHistory += "c";
         playerActionsBits ^= 1 << 1;
-        int diff = computerBets - playerBets;
-        if (diff > 0) {
-            playerBets += diff;
-            playerMoney -= diff;
+        if (gameState == GameState.ComputerRaised) {
+            int diff = computerBets - playerBets;
+            if (diff > 0) {
+                playerBets += diff;
+                playerMoney -= diff;
+            }
+        } else if (gameState == GameState.ComputerCalled) {
+            gameState = GameState.BothCalled;
+        } else {
+            gameState = GameState.PlayerCalled;
         }
-        isPlayerTurn = false;
-        next();
     }
 
     public void playerRaise(int raiseBets) throws TexasHoldemException {
@@ -195,26 +203,31 @@ public class TexasHoldem {
         playerMoney -= raiseBets;
         playerBets += raiseBets;
         actionHistory += "b" + raiseBets;
-        isPlayerTurn = false;
-        next();
+        gameState = GameState.PlayerRaised;
     }
 
     public void computerFold() {
+        message = "Computer fold";
         actionHistory += "f";
         playerMoney += totalBets;
         endRound();
     }
 
     public void computerCall() {
+        message = "Computer Call";
         actionHistory += "c";
         computerActionBits ^= 1 << 1;
-        int diff = playerBets - computerBets;
-        if (diff > 0) {
-            computerBets += diff;
-            computerMoney -= diff;
-            isPlayerTurn = true;
+        if (gameState == GameState.PlayerRaised) {
+            int diff = playerBets - computerBets;
+            if (diff > 0) {
+                computerBets += diff;
+                computerMoney -= diff;
+            }
+        } else if (gameState == GameState.PlayerCalled) {
+            gameState = GameState.BothCalled;
+        } else {
+            gameState = GameState.ComputerCalled;
         }
-        next();
     }
 
     public void computerRaise(int raiseBets) throws TexasHoldemException {
@@ -225,8 +238,7 @@ public class TexasHoldem {
         computerMoney -= raiseBets;
         computerBets += raiseBets;
         actionHistory += "b" + raiseBets;
-        isPlayerTurn = true;
-        next();
+        gameState = GameState.ComputerRaised;
     }
 
     public void takeAction(AIPlayer aiPlayer) {
@@ -274,14 +286,26 @@ public class TexasHoldem {
         return (computerActionBits >> 2 & 1) == 1;
     }
 
+    public boolean isPlayerTurn() {
+        return gameState == GameState.PlayerTurn || gameState == GameState.ComputerCalled || gameState == GameState.ComputerRaised;
+    }
+
+    public boolean isComputerTurn() {
+        return gameState == GameState.ComputerTurn || gameState == GameState.PlayerCalled || gameState == GameState.PlayerRaised;
+    }
+
+    public boolean isBothCalled() {
+        return gameState == GameState.BothCalled;
+    }
+
     // Getters
+
+    public GameState getGameState() {
+        return gameState;
+    }
 
     public String getGameLogResults() {
         return gameLogResults;
-    }
-
-    public boolean isPlayerTurn() {
-        return isPlayerTurn;
     }
 
     public int getRounds() {
