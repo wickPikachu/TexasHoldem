@@ -15,8 +15,11 @@ public interface GameLogDao {
     LiveData<List<GameLog>> findUnsyncResults();
 
     @Insert
-    void insertAll(GameLog... results);
+    void insert(GameLog gameLog);
+
+    @Insert
+    void insertAll(GameLog... gameLogs);
 
     @Delete
-    void delete(GameLog result);
+    void delete(GameLog gameLog);
 }

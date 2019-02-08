@@ -1,8 +1,11 @@
 package hk.edu.cityu.cs.fyp.texasholdem;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +21,7 @@ import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
+import hk.edu.cityu.cs.fyp.texasholdem.db.GameLog;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 import hk.edu.cityu.cs.fyp.texasholdem.model.AIPlayer;
 import hk.edu.cityu.cs.fyp.texasholdem.model.RandomAIPlayer;
@@ -25,6 +29,8 @@ import hk.edu.cityu.cs.fyp.texasholdem.model.TexasHoldem;
 import hk.edu.cityu.cs.fyp.texasholdem.viewmodel.GameViewModel;
 
 public class GameActivity extends AppCompatActivity {
+
+    public static final String TAG = "GameActivity";
 
     @BindViews({
             R.id.table_card1,
@@ -77,6 +83,7 @@ public class GameActivity extends AppCompatActivity {
     GameViewModel gameViewModel;
     TexasHoldem texasHoldem;
     AIPlayer aiPlayer;
+    List<GameLog> unSyncGameLogs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +96,13 @@ public class GameActivity extends AppCompatActivity {
 
         // TODO: view texasHoldem to control DB
         gameViewModel = ViewModelProviders.of(this).get(GameViewModel.class);
+        gameViewModel.getUnsyncResult().observe(this, new Observer<List<GameLog>>() {
+            @Override
+            public void onChanged(@Nullable List<GameLog> gameLogs) {
+                if (unSyncGameLogs == null)
+                    unSyncGameLogs = gameLogs;
+            }
+        });
 
         // default $200 in raise editText
         raiseBetsEditText.setText("200");
@@ -165,7 +179,9 @@ public class GameActivity extends AppCompatActivity {
     private SeekBar.OnSeekBarChangeListener onRaiseValueSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            // TODO: change raise bet
+            int playerMoney = texasHoldem.getPlayerMoney();
+            int changedBets = (int) ((progress * (double) playerMoney / 100) / 100 * 100);
+            raiseBetsEditText.setText(changedBets);
         }
 
         @Override
@@ -176,5 +192,13 @@ public class GameActivity extends AppCompatActivity {
         public void onStopTrackingTouch(SeekBar seekBar) {
         }
     };
+
+    @OnClick(R.id.round)
+    public void onRoundTextClicked() {
+        if (unSyncGameLogs != null && !unSyncGameLogs.isEmpty()) {
+            Log.d(TAG, "onRoundTextClicked: " + unSyncGameLogs.size());
+            Log.d(TAG, "onRoundTextClicked: " + unSyncGameLogs.get(0).toString());
+        }
+    }
 
 }

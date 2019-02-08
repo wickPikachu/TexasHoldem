@@ -1,10 +1,14 @@
 package hk.edu.cityu.cs.fyp.texasholdem.model;
 
+import android.os.AsyncTask;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Stack;
 
 import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
+import hk.edu.cityu.cs.fyp.texasholdem.TexasHoldemApplication;
+import hk.edu.cityu.cs.fyp.texasholdem.db.GameLog;
 
 public class TexasHoldem {
 
@@ -171,15 +175,28 @@ public class TexasHoldem {
         } else {
             message = "All rounds finished";
         }
+
+        // insert to database
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                GameLog gameLog = new GameLog();
+                gameLog.setResult(gameLogResults);
+                TexasHoldemApplication.db.getResultDao().insert(gameLog);
+                return null;
+            }
+        }.execute();
     }
 
     public void playerFold() {
+        message = "You folded";
         actionHistory += "f";
         computerMoney += totalBets;
         endRound();
     }
 
     public void playerCall() {
+        message = "You called";
         actionHistory += "c";
         playerActionsBits ^= 1 << 1;
         if (gameState == GameState.ComputerRaised) {
@@ -200,6 +217,7 @@ public class TexasHoldem {
             message = "Your money do not enough";
             throw new TexasHoldemException(message);
         }
+        message = "You raised " + raiseBets + " dollar";
         playerMoney -= raiseBets;
         playerBets += raiseBets;
         actionHistory += "b" + raiseBets;
@@ -207,14 +225,14 @@ public class TexasHoldem {
     }
 
     public void computerFold() {
-        message = "Computer fold";
+        message = "Computer folded";
         actionHistory += "f";
         playerMoney += totalBets;
         endRound();
     }
 
     public void computerCall() {
-        message = "Computer Call";
+        message = "Computer Called";
         actionHistory += "c";
         computerActionBits ^= 1 << 1;
         if (gameState == GameState.PlayerRaised) {

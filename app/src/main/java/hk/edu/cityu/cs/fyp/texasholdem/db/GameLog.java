@@ -23,7 +23,8 @@ public class GameLog {
     @ColumnInfo(name = "created_at")
     private Date createdAt;
 
-    public GameLog(){}
+    public GameLog() {
+    }
 
     public GameLog(String data) {
         this.result = data;
@@ -60,6 +61,10 @@ public class GameLog {
 
     public Date getCreatedAt() {
         return createdAt;
+    }
+
+    public String toString() {
+        return "result:" + result + "\n" + "synced:" + isSync + "\n";
     }
 
 }
