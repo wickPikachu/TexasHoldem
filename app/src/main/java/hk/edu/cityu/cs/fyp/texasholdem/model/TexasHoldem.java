@@ -12,8 +12,8 @@ import hk.edu.cityu.cs.fyp.texasholdem.db.GameLog;
 
 public class TexasHoldem {
 
-    public static final int BIG_BLIND_BET = 200;
-    public static final int ROUNDS_LIMIT = 50;
+    public static final int BIG_BLIND_BET = 100;
+    public static final int ROUNDS_LIMIT = 100;
     // bitwise for actions:
     //      raise bit, call bit, fold bit
     //          0         0         0

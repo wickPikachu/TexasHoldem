@@ -10,5 +10,6 @@
     <string name="you">You:</string>
     <string name="computer">Computer:</string>
     <string name="raise_">Raise:</string>
+    <string name="setting">Setting</string>
 
 </resources>

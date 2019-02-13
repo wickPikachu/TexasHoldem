@@ -13,6 +13,7 @@ public class CardDecisions {
     private static final int FLUSH = 5000;
     private static final int FOUR_OF_A_KIND = 7000;
     private static final int STRAIGHT_FLUSH = 8000;
+    private static final int ROYAL_FLUSH = 9000;
 
     private static final int SHIFT_CLASS = 1;
     private static final int SHIFT_NUMBER = 4;
@@ -40,6 +41,7 @@ public class CardDecisions {
         cardNumberList.add('k');
         cardNumberList.add('a');
     }
+
     // 0 0 0 0 | 0 0 0 0 | 0 0 0 0 | 0 0 0 0 | 0 0 0 0 | 0 0 0 0 | ... | 0 0 0 0 | 0 0 0 0
     //    A         K         Q         J         T         9      ...      3         2
     private long cards = 0;
@@ -60,7 +62,6 @@ public class CardDecisions {
     }
 
 
-
     public void clear() {
         cards = 0;
     }
@@ -74,6 +75,42 @@ public class CardDecisions {
     }
 
     private boolean isFullHouse() {
+        // TODO:
+        return true;
+    }
+
+
+    private boolean isStraight() {
+        // TODO:
+        return true;
+    }
+
+
+    private boolean isThreeOfAKind() {
+        // TODO:
+        return true;
+    }
+
+
+    private boolean isFlush() {
+        // TODO:
+        return true;
+    }
+
+
+    private boolean isFourOfAKind() {
+        // TODO:
+        return true;
+    }
+
+
+    private boolean isStraightFlush() {
+        // TODO:
+        return true;
+    }
+
+
+    private boolean isRoyalFlush() {
         // TODO:
         return true;
     }

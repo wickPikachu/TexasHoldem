@@ -25,8 +25,8 @@
 
     <ImageView
         android:id="@+id/image_home"
-        android:layout_width="240dp"
-        android:layout_height="140dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:src="@drawable/aces"
         app:layout_constraintBottom_toTopOf="@+id/play"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -40,10 +40,22 @@
         android:layout_margin="16dp"
         android:text="@string/play"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/help"
+        app:layout_constraintBottom_toTopOf="@+id/setting"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/image_home" />
+
+    <Button
+        android:id="@+id/setting"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/setting"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/help"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play" />
 
     <Button
         android:id="@+id/help"
@@ -55,6 +67,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/play" />
+        app:layout_constraintTop_toBottomOf="@+id/setting" />
 
 </android.support.constraint.ConstraintLayout>
