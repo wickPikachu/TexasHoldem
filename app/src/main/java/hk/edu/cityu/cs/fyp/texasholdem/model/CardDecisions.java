@@ -54,66 +54,85 @@ public class CardDecisions {
         return 0;
     }
 
-    public void addCard(String card) {
-        char cardClass = card.charAt(0);
-        char cardNumber = card.charAt(1);
-
-        cards ^= 1 << cardNumberList.indexOf(cardNumber) << cardClassList.indexOf(cardClass);
+    public void addCard(String cardString) {
+        cards |= valueOfCard(cardString);
     }
 
+    public static int valueOfCard(String cardString) {
+        char cardClass = cardString.charAt(0);
+        char cardNumber = cardString.charAt(1);
+        return 1 << cardNumberList.indexOf(cardNumber) << cardClassList.indexOf(cardClass);
+    }
+
+    public int eval() {
+        return 0;
+    }
 
     public void clear() {
         cards = 0;
     }
 
-    private boolean isPair() {
+    public boolean isPair() {
         return true;
     }
 
-    private boolean isTwoPair() {
+    public boolean isTwoPair() {
         return true;
     }
 
-    private boolean isFullHouse() {
+    public boolean isFullHouse() {
         // TODO:
         return true;
     }
 
-
-    private boolean isStraight() {
+    public boolean isStraight() {
         // TODO:
         return true;
     }
 
-
-    private boolean isThreeOfAKind() {
+    public boolean isThreeOfAKind() {
         // TODO:
         return true;
     }
 
-
-    private boolean isFlush() {
+    public boolean isFlush() {
         // TODO:
         return true;
     }
 
-
-    private boolean isFourOfAKind() {
+    public boolean isFourOfAKind() {
         // TODO:
         return true;
     }
-
 
     private boolean isStraightFlush() {
         // TODO:
         return true;
     }
 
+    public static boolean isRoyalFlush(int cards) {
+        char[] suits = {'d', 'c', 'h', 's'};
+        char[] nums = {'t', 'j', 'q', 'k', 'a'};
 
-    private boolean isRoyalFlush() {
-        // TODO:
-        return true;
+        for (char suit : suits) {
+            int value = 0;
+            for (char num : nums) {
+                value |= valueOfCard("" + suit + num);
+            }
+            if ((cards ^ value) == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
+    public static boolean isRoyalFlush(String[] cards) {
+        int cardValues = 0;
+        for (String card : cards)
+            cardValues |= valueOfCard(card);
+        return isRoyalFlush(cardValues);
+    }
+
+    // TODO: get best list
 
 }
