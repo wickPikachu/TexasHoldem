@@ -130,7 +130,7 @@ public class TexasHoldem {
         playerMoney -= playerBets;
         computerMoney -= computerBets;
 
-        for (char c : CardDecisions.cardClassList) {
+        for (char c : CardDecisions.cardSuitList) {
             for (char n : CardDecisions.cardNumberList) {
                 deck.add("" + c + n);
             }

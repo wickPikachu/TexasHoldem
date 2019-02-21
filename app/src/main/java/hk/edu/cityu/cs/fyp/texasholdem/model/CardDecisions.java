@@ -19,14 +19,14 @@ public class CardDecisions {
     private static final int SHIFT_NUMBER = 4;
 
     // Diamonds, Clubs, Hearts, Spades
-    public static final List<Character> cardClassList = new ArrayList<>();
+    public static final List<Character> cardSuitList = new ArrayList<>();
     public static final List<Character> cardNumberList = new ArrayList<>();
 
     static {
-        cardClassList.add('d');
-        cardClassList.add('c');
-        cardClassList.add('h');
-        cardClassList.add('s');
+        cardSuitList.add('d');
+        cardSuitList.add('c');
+        cardSuitList.add('h');
+        cardSuitList.add('s');
         cardNumberList.add('2');
         cardNumberList.add('3');
         cardNumberList.add('4');
@@ -48,9 +48,9 @@ public class CardDecisions {
 
     // straight_flush, four of a kind, flush, straight, three of a kind, full house, two pairs, pairs
     // 11111111
-    private int combinations = 0;
+    private long combinations = 0;
 
-    public int getValues() {
+    public long getValues() {
         return 0;
     }
 
@@ -58,10 +58,18 @@ public class CardDecisions {
         cards |= valueOfCard(cardString);
     }
 
-    public static int valueOfCard(String cardString) {
+    public static long getCardsValues(String[] cards) {
+        long values = 0L;
+        for (String card : cards)
+            values |= valueOfCard(card);
+        return values;
+    }
+
+    public static long valueOfCard(String cardString) {
+        cardString = cardString.toLowerCase();
         char cardClass = cardString.charAt(0);
         char cardNumber = cardString.charAt(1);
-        return 1 << cardNumberList.indexOf(cardNumber) << cardClassList.indexOf(cardClass);
+        return 1L << (cardNumberList.indexOf(cardNumber) * 4) << cardSuitList.indexOf(cardClass);
     }
 
     public int eval() {
@@ -95,42 +103,90 @@ public class CardDecisions {
         return true;
     }
 
-    public boolean isFlush() {
-        // TODO:
-        return true;
-    }
-
-    public boolean isFourOfAKind() {
-        // TODO:
-        return true;
-    }
-
-    private boolean isStraightFlush() {
-        // TODO:
-        return true;
-    }
-
-    public static boolean isRoyalFlush(int cards) {
-        char[] suits = {'d', 'c', 'h', 's'};
-        char[] nums = {'t', 'j', 'q', 'k', 'a'};
-
-        for (char suit : suits) {
-            int value = 0;
-            for (char num : nums) {
-                value |= valueOfCard("" + suit + num);
+    public static boolean isFlush(long cards) {
+        // check suits,
+        // from 0 to 3 represent {Diamonds, Clubs, Hearts, Spades}
+        long[] suitValues = {0x1L, 0x2L, 0x4L, 0x8L};
+        for (long suitValue : suitValues) {
+            int countSameSuit = 0;
+            long tempCards = cards;
+            for (int j = 0; j < 13; j++) {
+                if ((tempCards & suitValue) == suitValue)
+                    countSameSuit += 1;
+                tempCards >>= 4;
             }
-            if ((cards ^ value) == 0) {
+            if (countSameSuit >= 5)
                 return true;
+        }
+        return false;
+    }
+
+    public static boolean isFlush(String[] cards) {
+        return isFlush(getCardsValues(cards));
+    }
+
+    public static boolean isFourOfAKind(long cards) {
+        long fourOfKindValue = 0xFL;
+        // check from 2 to A, total 13 cards
+        for (int num = 0; num < 13; num++) {
+            if ((cards & fourOfKindValue) == fourOfKindValue)
+                return true;
+            fourOfKindValue <<= 4;
+        }
+        return false;
+    }
+
+    public static boolean isFourOfAKind(String[] cards) {
+        return isFourOfAKind(getCardsValues(cards));
+    }
+
+    public static boolean isStraightFlush(long cards) {
+        // check from Diamonds, Clubs, Hearts, Spades,
+        // and from {2,3,4,5,6} to {10,J,Q,K,A};
+        long straightFlushValue = 0x11111L;
+        // TODO: straight flush value
+        for (int num = 2; num <= 10; num++) {
+            for (int suit = 0; suit < 4; suit++) {
+                if ((cards & straightFlushValue) == straightFlushValue)
+                    return true;
+                straightFlushValue <<= 1;
             }
         }
         return false;
     }
 
+    public static boolean isStraightFlush(String[] cards) {
+        return isStraightFlush(getCardsValues(cards));
+    }
+
+    public static boolean isRoyalFlush(long cards) {
+//        char[] suits = {'d', 'c', 'h', 's'};
+//        char[] nums = {'t', 'j', 'q', 'k', 'a'};
+//
+//        for (char suit : suits) {
+//            int value = 0;
+//            for (char num : nums) {
+//                value |= valueOfCard("" + suit + num);
+//            }
+//            if ((cards & value) == value) {
+//                return true;
+//            }
+//        }
+//        return false;
+
+        long royalFlush1 = 0x11111L << 32;
+        long royalFlush2 = 0x11111L << 33;
+        long royalFlush3 = 0x11111L << 34;
+        long royalFlush4 = 0x11111L << 35;
+
+        return (cards & royalFlush1) == royalFlush1 ||
+                (cards & royalFlush2) == royalFlush2 ||
+                (cards & royalFlush3) == royalFlush3 ||
+                (cards & royalFlush4) == royalFlush4;
+    }
+
     public static boolean isRoyalFlush(String[] cards) {
-        int cardValues = 0;
-        for (String card : cards)
-            cardValues |= valueOfCard(card);
-        return isRoyalFlush(cardValues);
+        return isRoyalFlush(getCardsValues(cards));
     }
 
     // TODO: get best list
