@@ -72,35 +72,130 @@ public class CardDecisions {
         return 1L << (cardNumberList.indexOf(cardNumber) * 4) << cardSuitList.indexOf(cardClass);
     }
 
-    public int eval() {
-        return 0;
-    }
-
     public void clear() {
         cards = 0;
     }
 
-    public boolean isPair() {
-        return true;
+    public int eval() {
+        return 0;
     }
 
-    public boolean isTwoPair() {
-        return true;
+    public static boolean isPair(long cards) {
+        for (int i = 0; i < cardNumberList.size(); i++) {
+            int countSameNum = 0;
+            for (int j = 0; j < cardSuitList.size(); j++) {
+                if ((cards & 1L) == 1L) {
+                    countSameNum++;
+                }
+                cards >>= 1;
+            }
+            if (countSameNum == 2) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public boolean isFullHouse() {
-        // TODO:
-        return true;
+    private static int countSameNum(long cards) {
+        int count = 0;
+        for (int i = 0; i < 4; i++) {
+            if ((cards & 1L) == 1L) {
+                ++count;
+                cards >>= 1;
+            }
+        }
+        return count;
     }
 
-    public boolean isStraight() {
-        // TODO:
-        return true;
+    public static boolean isPair(String[] cards) {
+        return isPair(getCardsValues(cards));
     }
 
-    public boolean isThreeOfAKind() {
-        // TODO:
-        return true;
+    public static boolean isTwoPair(long cards) {
+        int countPair = 0;
+        for (int i = 0; i < cardNumberList.size(); i++) {
+            if (countSameNum(cards) >= 2) {
+                ++countPair;
+                if (countPair == 2) {
+                    return true;
+                }
+            }
+            cards >>= 4;
+        }
+        return false;
+    }
+
+    public static boolean isTwoPair(String[] cards) {
+        return isTwoPair(getCardsValues(cards));
+    }
+
+    public static boolean isFullHouse(long cards) {
+        int[] countSameArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        boolean hasThreeOfKind = false;
+        boolean hasTwoPair = false;
+        int threeOfKindValue = -1;
+        int twoPairValue = -1;
+        for (int i = 0; i < countSameArray.length; i++) {
+            countSameArray[i] = countSameNum(cards);
+            if (countSameArray[i] == 3 & countSameArray[i] > threeOfKindValue) {
+                hasThreeOfKind = true;
+                threeOfKindValue = i;
+            } else if (countSameArray[i] == 2 && countSameArray[i] > twoPairValue) {
+                hasTwoPair = true;
+                twoPairValue = i;
+            }
+            cards >>= 4;
+        }
+
+        return hasThreeOfKind && hasTwoPair;
+    }
+
+    public static boolean isFullHouse(String[] cards) {
+        return isFullHouse(getCardsValues(cards));
+    }
+
+    public static boolean isStraight(long cards) {
+        long straightValue = 0xFL;
+        for (int i = 0; i < 9; i++) {
+            long tempCards = cards >> (i * 4);
+            for (int j = 0; j < 5; j++) {
+                if ((tempCards & straightValue) > 0) {
+                    // isStraight
+                    if (j == 4) {
+                        return true;
+                    }
+                    tempCards >>= 4;
+                    continue;
+                }
+
+                break;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isStraight(String[] cards) {
+        return isStraight(getCardsValues(cards));
+    }
+
+    public static boolean isThreeOfAKind(long cards) {
+        for (int i = 0; i < cardNumberList.size(); i++) {
+            int countSameNum = 0;
+            for (int j = 0; j < cardSuitList.size(); j++) {
+                if ((cards & 1L) == 1L) {
+                    countSameNum++;
+                }
+                cards >>= 1;
+            }
+            if (countSameNum == 3) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isThreeOfAKind(String[] cards) {
+        return isThreeOfAKind(getCardsValues(cards));
     }
 
     public static boolean isFlush(long cards) {
@@ -112,7 +207,7 @@ public class CardDecisions {
             long tempCards = cards;
             for (int j = 0; j < 13; j++) {
                 if ((tempCards & suitValue) == suitValue)
-                    countSameSuit += 1;
+                    countSameSuit++;
                 tempCards >>= 4;
             }
             if (countSameSuit >= 5)
