@@ -60,21 +60,21 @@ public class CardDecisionsTest {
 
     @Test
     public void isPair() {
-        String[] cards1 = {"d2", "d3", "d4", "d5", "d6"};
+        String[] cards1 = {"s3", "d3", "d4", "d5", "d6"};
         boolean actual1 = CardDecisions.isPair(cards1);
         assertEquals(true, actual1);
 
-        String[] cards2 = {"d2", "d3", "d4", "d5", "h6"};
+        String[] cards2 = {"d2", "s2", "d4", "d5", "h6"};
         boolean actual2 = CardDecisions.isPair(cards2);
         assertEquals(true, actual2);
 
-        String[] cards3 = {"st", "ha", "hq", "dj", "dk"};
+        String[] cards3 = {"sa", "ha", "hq", "dj", "dk"};
         boolean actual3 = CardDecisions.isPair(cards3);
         assertEquals(true, actual3);
 
         String[] cards4 = {"c3", "ca", "ck", "c6", "c2", "d6"};
         boolean actual4 = CardDecisions.isPair(cards4);
-        assertEquals(false, actual4);
+        assertEquals(true, actual4);
 
         String[] cards5 = {"ha", "da", "ca", "cj", "cq"};
         boolean actual5 = CardDecisions.isPair(cards5);
@@ -91,17 +91,17 @@ public class CardDecisionsTest {
 
     @Test
     public void isTwoPair() {
-        String[] cards1 = {"d2", "d3", "d4", "d5", "d6"};
+        String[] cards1 = {"d2", "d3", "s2", "s3", "d6"};
         boolean actual1 = CardDecisions.isTwoPair(cards1);
         assertEquals(true, actual1);
 
-        String[] cards2 = {"d2", "d3", "d4", "d5", "h6"};
+        String[] cards2 = {"da", "d2", "s2", "ha", "h6"};
         boolean actual2 = CardDecisions.isTwoPair(cards2);
         assertEquals(true, actual2);
 
-        String[] cards3 = {"st", "ha", "hq", "dj", "dk"};
+        String[] cards3 = {"sa", "ha", "hq", "sq", "da"};
         boolean actual3 = CardDecisions.isTwoPair(cards3);
-        assertEquals(true, actual3);
+        assertEquals(false, actual3);
 
         String[] cards4 = {"c3", "ca", "ck", "c6", "c2", "d6"};
         boolean actual4 = CardDecisions.isTwoPair(cards4);
@@ -122,15 +122,15 @@ public class CardDecisionsTest {
 
     @Test
     public void isFullHouse() {
-        String[] cards1 = {"d2", "d3", "d4", "d5", "d6"};
+        String[] cards1 = {"d2", "d3", "s2", "h3", "c2"};
         boolean actual1 = CardDecisions.isFullHouse(cards1);
         assertEquals(true, actual1);
 
-        String[] cards2 = {"d2", "d3", "d4", "d5", "h6"};
+        String[] cards2 = {"da", "sa", "ca", "dk", "hk"};
         boolean actual2 = CardDecisions.isFullHouse(cards2);
         assertEquals(true, actual2);
 
-        String[] cards3 = {"st", "ha", "hq", "dj", "dk"};
+        String[] cards3 = {"sa", "ha", "hq", "sq", "da"};
         boolean actual3 = CardDecisions.isFullHouse(cards3);
         assertEquals(true, actual3);
 

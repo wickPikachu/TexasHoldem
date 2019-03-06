@@ -11,10 +11,9 @@
         android:layout_height="80dp"
         android:padding="8dp"
         android:text="@string/texas_holdem"
-        android:textColor="#"
         android:textSize="24sp"
-        tools:ignore="MissingConstraints">
-
-    </TextView>
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

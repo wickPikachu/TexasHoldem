@@ -98,11 +98,12 @@ public class CardDecisions {
 
     private static int countSameNum(long cards) {
         int count = 0;
+        long tempCards = cards;
         for (int i = 0; i < 4; i++) {
-            if ((cards & 1L) == 1L) {
+            if ((tempCards & 0x1L) == 0x1L) {
                 ++count;
-                cards >>= 1;
             }
+            tempCards >>= 1;
         }
         return count;
     }
@@ -114,7 +115,7 @@ public class CardDecisions {
     public static boolean isTwoPair(long cards) {
         int countPair = 0;
         for (int i = 0; i < cardNumberList.size(); i++) {
-            if (countSameNum(cards) >= 2) {
+            if (countSameNum(cards) == 2) {
                 ++countPair;
                 if (countPair == 2) {
                     return true;
