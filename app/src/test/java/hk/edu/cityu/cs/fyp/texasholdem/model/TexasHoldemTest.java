@@ -1,13 +1,31 @@
 package hk.edu.cityu.cs.fyp.texasholdem.model;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class TexasHoldemTest {
 
+    TexasHoldem texasHoldem = null;
+
+    @Before
+    public void setUp() throws Exception {
+        texasHoldem = TexasHoldem.getInstance();
+        texasHoldem.init();
+    }
+
     @Test
     public void startRound() {
+        assertEquals(20000, texasHoldem.getComputerMoney());
+        assertEquals(20000, texasHoldem.getPlayerMoney());
+        assertEquals(0, texasHoldem.getComputerBets());
+        assertEquals(0, texasHoldem.getComputerBets());
+        assertEquals(0, texasHoldem.getTotalBets());
+
+        texasHoldem.startRound();
+        assertEquals(20000 - TexasHoldem.BIG_BLIND_BET, texasHoldem.getComputerMoney());
+        assertEquals(20000 - TexasHoldem.BIG_BLIND_BET / 2, texasHoldem.getPlayerMoney());
     }
 
     @Test
