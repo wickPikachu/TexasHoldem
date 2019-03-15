@@ -51,6 +51,7 @@ public class TexasHoldemTest {
 
         texasHoldem.computerFold();
         assertEquals(playerMoney + totalBets, texasHoldem.getPlayerMoney());
+        assertEquals(computerMoney + totalBets, texasHoldem.getPlayerMoney());
 
     }
 }

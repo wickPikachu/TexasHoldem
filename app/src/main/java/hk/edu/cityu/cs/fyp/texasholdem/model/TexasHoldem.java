@@ -153,12 +153,7 @@ public class TexasHoldem {
     public void endRound() {
         actionHistory += "";
         gameLogResults += rounds + ":" + actionHistory + "|" + cardHistory + "|" + betsResult + "\n";
-
-        if (rounds < ROUNDS_LIMIT) {
-            startRound();
-        } else {
-            message = "All rounds finished";
-        }
+        message = "This round winner is " ;
 
         // insert to database
         if (isSaveLogs) {

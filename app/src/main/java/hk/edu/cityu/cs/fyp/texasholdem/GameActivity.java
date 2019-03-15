@@ -180,8 +180,8 @@ public class GameActivity extends AppCompatActivity {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             int playerMoney = texasHoldem.getPlayerMoney();
-            int changedBets = (int) ((progress * (double) playerMoney / 100) / 100 * 100);
-            raiseBetsEditText.setText(changedBets);
+            int changedBets = ((int) (progress * (double) playerMoney / 100) / 100) * 100;
+            raiseBetsEditText.setText("" + changedBets);
         }
 
         @Override

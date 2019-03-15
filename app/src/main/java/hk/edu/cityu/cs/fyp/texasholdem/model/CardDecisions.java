@@ -18,6 +18,10 @@ public class CardDecisions {
     private static final int SHIFT_CLASS = 1;
     private static final int SHIFT_NUMBER = 4;
 
+    enum CardGroup {
+
+    }
+
     // Diamonds, Clubs, Hearts, Spades
     public static final List<Character> cardSuitList = new ArrayList<>();
     public static final List<Character> cardNumberList = new ArrayList<>();
@@ -76,7 +80,7 @@ public class CardDecisions {
         cards = 0;
     }
 
-    public int eval() {
+    public static long eval(long cards) {
         return 0;
     }
 

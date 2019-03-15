@@ -10,7 +10,7 @@ import java.util.Date;
 @Entity
 public class GameLog {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private int uid;
 
     @ColumnInfo(name = "result")

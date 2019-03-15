@@ -11,5 +11,9 @@
     <string name="computer">Computer:</string>
     <string name="raise_">Raise:</string>
     <string name="setting">Setting</string>
+    <string name="minus2">-$200</string>
+    <string name="minus1">-$100</string>
+    <string name="add1">+$100</string>
+    <string name="add2">+$200</string>
 
 </resources>
