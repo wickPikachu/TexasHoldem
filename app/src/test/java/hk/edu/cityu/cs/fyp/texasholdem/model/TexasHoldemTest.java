@@ -3,6 +3,8 @@ package hk.edu.cityu.cs.fyp.texasholdem.model;
 import org.junit.Before;
 import org.junit.Test;
 
+import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
+
 import static org.junit.Assert.*;
 
 public class TexasHoldemTest {
@@ -12,11 +14,13 @@ public class TexasHoldemTest {
     @Before
     public void setUp() throws Exception {
         texasHoldem = TexasHoldem.getInstance();
+        texasHoldem.setSaveLogs(false);
         texasHoldem.init();
     }
 
     @Test
-    public void startRound() {
+    public void startRound() throws TexasHoldemException {
+        int playerMoney, computerMoney, totalBets;
         assertEquals(20000, texasHoldem.getComputerMoney());
         assertEquals(20000, texasHoldem.getPlayerMoney());
         assertEquals(0, texasHoldem.getComputerBets());
@@ -26,129 +30,27 @@ public class TexasHoldemTest {
         texasHoldem.startRound();
         assertEquals(20000 - TexasHoldem.BIG_BLIND_BET, texasHoldem.getComputerMoney());
         assertEquals(20000 - TexasHoldem.BIG_BLIND_BET / 2, texasHoldem.getPlayerMoney());
-    }
 
-    @Test
-    public void next() {
-    }
+        texasHoldem.playerCall();
+        assertEquals(20000 - TexasHoldem.BIG_BLIND_BET, texasHoldem.getComputerMoney());
+        assertEquals(20000 - TexasHoldem.BIG_BLIND_BET, texasHoldem.getPlayerMoney());
 
-    @Test
-    public void endRound() {
-    }
+        playerMoney = texasHoldem.getPlayerMoney();
+        computerMoney = texasHoldem.getComputerMoney();
+        texasHoldem.computerRaise(1000);
+        assertEquals(computerMoney - 1000, texasHoldem.getComputerMoney());
+        assertEquals(playerMoney, texasHoldem.getPlayerMoney());
 
-    @Test
-    public void playerFold() {
-    }
+        texasHoldem.playerCall();
+        assertEquals(computerMoney - 1000, texasHoldem.getComputerMoney());
+        assertEquals(computerMoney - 1000, texasHoldem.getPlayerMoney());
 
-    @Test
-    public void playerCall() {
-    }
+        playerMoney = texasHoldem.getPlayerMoney();
+        computerMoney = texasHoldem.getComputerMoney();
+        totalBets = texasHoldem.getTotalBets();
 
-    @Test
-    public void playerRaise() {
-    }
+        texasHoldem.computerFold();
+        assertEquals(playerMoney + totalBets, texasHoldem.getPlayerMoney());
 
-    @Test
-    public void computerFold() {
-    }
-
-    @Test
-    public void computerCall() {
-    }
-
-    @Test
-    public void computerRaise() {
-    }
-
-    @Test
-    public void takeAction() {
-    }
-
-    @Test
-    public void canPlayerFold() {
-    }
-
-    @Test
-    public void canPlayerCall() {
-    }
-
-    @Test
-    public void canPlayerRaise() {
-    }
-
-    @Test
-    public void canComputerFold() {
-    }
-
-    @Test
-    public void canComputerCall() {
-    }
-
-    @Test
-    public void canComputerRaise() {
-    }
-
-    @Test
-    public void isPlayerTurn() {
-    }
-
-    @Test
-    public void isComputerTurn() {
-    }
-
-    @Test
-    public void isBothCalled() {
-    }
-
-    @Test
-    public void getGameState() {
-    }
-
-    @Test
-    public void getGameLogResults() {
-    }
-
-    @Test
-    public void getRounds() {
-    }
-
-    @Test
-    public void getTotalBets() {
-    }
-
-    @Test
-    public void getPlayerMoney() {
-    }
-
-    @Test
-    public void getPlayerBets() {
-    }
-
-    @Test
-    public void getComputerMoney() {
-    }
-
-    @Test
-    public void getComputerBets() {
-    }
-
-    @Test
-    public void getPlayerCardList() {
-    }
-
-    @Test
-    public void getComputerCardList() {
-    }
-
-    @Test
-    public void getTableCardList() {
-    }
-
-    @Test
-    public void isPlayerBuildBets() {
-    }
-
-    @Test
-    public void getMessage() {
     }
 }

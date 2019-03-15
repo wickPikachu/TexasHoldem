@@ -28,6 +28,8 @@ public class TexasHoldem {
     private ArrayList<String> tableCardList = new ArrayList<>();
     private Stack<String> deck = new Stack<>();
 
+    // for save log to db
+    private boolean isSaveLogs = true;
     private boolean isPlayerBuildBets;
     // this round is player action first (computer is big blind bets)
     private boolean isPlayerActionFirst;
@@ -53,13 +55,9 @@ public class TexasHoldem {
 
     private int playerMoney;
     private int playerBets;
-    // bitwise
-    private int playerActionsBits;
 
     private int computerMoney;
     private int computerBets;
-    // bitwise
-    private int computerActionBits;
 
     private String actionHistory;
     private String cardHistory;
@@ -85,10 +83,6 @@ public class TexasHoldem {
         betsResult = "";
         gameLogResults = "";
 
-        // fold is usually allow
-        playerActionsBits = 1;
-        computerActionBits = 1;
-
         rounds = 0;
         turn = 0;
         totalBets = 0;
@@ -110,12 +104,6 @@ public class TexasHoldem {
         rounds += 1;
         isPlayerBuildBets = !isPlayerBuildBets;
         message = "Round Start";
-
-        // allow raise and call
-        computerActionBits ^= 1 << 1;
-        computerActionBits ^= 1 << 2;
-        playerActionsBits ^= 1 << 1;
-        playerActionsBits ^= 1 << 2;
 
         // TODO: change who action first
         if (isPlayerBuildBets) {
@@ -155,10 +143,6 @@ public class TexasHoldem {
         } else {    // table cards size is 3 or 4
             tableCardList.add(deck.pop());
         }
-        playerActionsBits ^= 1 << 1;
-        playerActionsBits ^= 1 << 2;
-        computerActionBits ^= 1 << 1;
-        computerActionBits ^= 1 << 2;
         actionHistory += "/";
         ++turn;
     }
@@ -177,15 +161,16 @@ public class TexasHoldem {
         }
 
         // insert to database
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                GameLog gameLog = new GameLog();
-                gameLog.setResult(gameLogResults);
-                TexasHoldemApplication.db.getResultDao().insert(gameLog);
-                return null;
-            }
-        }.execute();
+        if (isSaveLogs) {
+            Thread t = new Thread() {
+                public void run() {
+                    GameLog gameLog = new GameLog();
+                    gameLog.setResult("test");
+                    TexasHoldemApplication.db.getResultDao().insert(gameLog);
+                }
+            };
+            t.start();
+        }
     }
 
     public void playerFold() {
@@ -198,14 +183,12 @@ public class TexasHoldem {
     public void playerCall() {
         message = "You called";
         actionHistory += "c";
-        playerActionsBits ^= 1 << 1;
-        if (gameState == GameState.ComputerRaised) {
-            int diff = computerBets - playerBets;
-            if (diff > 0) {
-                playerBets += diff;
-                playerMoney -= diff;
-            }
-        } else if (gameState == GameState.ComputerCalled) {
+        int diff = computerBets - playerBets;
+        if (diff > 0) {
+            playerBets += diff;
+            playerMoney -= diff;
+        }
+        if (gameState == GameState.ComputerRaised || gameState == GameState.ComputerCalled) {
             gameState = GameState.BothCalled;
         } else {
             gameState = GameState.PlayerCalled;
@@ -234,14 +217,12 @@ public class TexasHoldem {
     public void computerCall() {
         message = "Computer Called";
         actionHistory += "c";
-        computerActionBits ^= 1 << 1;
-        if (gameState == GameState.PlayerRaised) {
-            int diff = playerBets - computerBets;
-            if (diff > 0) {
-                computerBets += diff;
-                computerMoney -= diff;
-            }
-        } else if (gameState == GameState.PlayerCalled) {
+        int diff = playerBets - computerBets;
+        if (diff > 0) {
+            computerBets += diff;
+            computerMoney -= diff;
+        }
+        if (gameState == GameState.PlayerRaised || gameState == GameState.PlayerCalled) {
             gameState = GameState.BothCalled;
         } else {
             gameState = GameState.ComputerCalled;
@@ -277,31 +258,6 @@ public class TexasHoldem {
         playerBets += totalBets / 2;
         computerBets += totalBets / 2;
         endRound();
-    }
-
-    // TODO: use bitwise
-    public boolean canPlayerFold() {
-        return (playerActionsBits & 1) == 1;
-    }
-
-    public boolean canPlayerCall() {
-        return (playerActionsBits >> 1 & 1) == 1;
-    }
-
-    public boolean canPlayerRaise() {
-        return (playerActionsBits >> 2 & 1) == 1;
-    }
-
-    public boolean canComputerFold() {
-        return (computerActionBits & 1) == 1;
-    }
-
-    public boolean canComputerCall() {
-        return (computerActionBits >> 1 & 1) == 1;
-    }
-
-    public boolean canComputerRaise() {
-        return (computerActionBits >> 2 & 1) == 1;
     }
 
     public boolean isPlayerTurn() {
@@ -370,4 +326,11 @@ public class TexasHoldem {
         return message;
     }
 
+    public boolean isSaveLogs() {
+        return isSaveLogs;
+    }
+
+    public void setSaveLogs(boolean saveLogs) {
+        isSaveLogs = saveLogs;
+    }
 }
