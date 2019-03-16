@@ -12,6 +12,8 @@ import hk.edu.cityu.cs.fyp.texasholdem.model.RandomAIPlayer;
 
 public class LogsActivity extends AppCompatActivity {
 
+    public static final String TAG = "LogsActivity";
+
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
 

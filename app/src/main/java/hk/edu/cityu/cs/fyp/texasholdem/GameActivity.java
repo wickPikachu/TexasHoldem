@@ -80,6 +80,9 @@ public class GameActivity extends AppCompatActivity {
     @BindView(R.id.message)
     TextView messageView;
 
+    @BindView(R.id.computer_text)
+    TextView computerNameText;
+
     GameViewModel gameViewModel;
     TexasHoldem texasHoldem;
     AIPlayer aiPlayer;
@@ -91,8 +94,9 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
         ButterKnife.bind(this);
 
-        // TODO: from shared preference get AI player level
-        aiPlayer = new RandomAIPlayer();
+        // from shared preference get AI player level
+        aiPlayer = Utils.getAIPlayer(this);
+        computerNameText.setText(aiPlayer.getClass().getSimpleName() + ":");
 
         // TODO: view texasHoldem to control DB
         gameViewModel = ViewModelProviders.of(this).get(GameViewModel.class);
@@ -199,6 +203,41 @@ public class GameActivity extends AppCompatActivity {
             Log.d(TAG, "onRoundTextClicked: " + unSyncGameLogs.size());
             Log.d(TAG, "onRoundTextClicked: " + unSyncGameLogs.get(0).toString());
         }
+    }
+
+    @OnClick({
+            R.id.add2,
+            R.id.add1,
+            R.id.minus1,
+            R.id.minus2
+    })
+    public void onAddMinusButtonClicked(Button button) {
+        int playerMoney = texasHoldem.getPlayerMoney();
+        int raiseBets = Integer.parseInt(raiseBetsEditText.getText().toString());
+        if (raiseBets % 100 != 0) {
+            raiseBets = 0;
+        }
+        switch (button.getId()) {
+            case R.id.add2:
+                raiseBets += 200;
+            case R.id.add1:
+                raiseBets += 100;
+                break;
+            case R.id.minus1:
+                raiseBets -= 100;
+                break;
+            case R.id.minus2:
+                raiseBets -= 200;
+                break;
+
+        }
+        if (raiseBets > playerMoney) {
+            raiseBets = playerMoney;
+        } else if (raiseBets < 0) {
+            raiseBets = 0;
+        }
+
+        raiseBetsEditText.setText("" + raiseBets);
     }
 
 }

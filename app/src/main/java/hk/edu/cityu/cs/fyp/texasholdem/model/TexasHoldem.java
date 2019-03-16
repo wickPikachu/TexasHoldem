@@ -46,7 +46,8 @@ public class TexasHoldem {
         ComputerTurn,
         ComputerCalled,
         ComputerRaised,
-        BothCalled
+        BothCalled,
+        RoundEnded
     }
 
     private GameState gameState;
@@ -172,7 +173,7 @@ public class TexasHoldem {
         message = "You folded";
         actionHistory += "f";
         computerMoney += totalBets;
-        endRound();
+//        endRound();
     }
 
     public void playerCall() {
@@ -206,7 +207,7 @@ public class TexasHoldem {
         message = "Computer folded";
         actionHistory += "f";
         playerMoney += totalBets;
-        endRound();
+//        endRound();
     }
 
     public void computerCall() {

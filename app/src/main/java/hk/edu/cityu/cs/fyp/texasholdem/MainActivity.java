@@ -12,6 +12,8 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String TAG = "MainActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +27,12 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @OnClick(R.id.setting)
+    public void onSettingClicked() {
+        Intent intent = new Intent(this, SettingActivity.class);
+        startActivity(intent);
+    }
+
     @OnClick(R.id.help)
     public void onHelpClicked() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -33,4 +41,5 @@ public class MainActivity extends AppCompatActivity {
         builder.setView(v);
         builder.show();
     }
+
 }
