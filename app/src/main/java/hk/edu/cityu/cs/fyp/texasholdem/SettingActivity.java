@@ -8,10 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.SharedPreferencesHelper;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 import hk.edu.cityu.cs.fyp.texasholdem.model.MachineLearningAIPlayer;
 import hk.edu.cityu.cs.fyp.texasholdem.model.MiniMaxAIPlayer;
 import hk.edu.cityu.cs.fyp.texasholdem.model.RandomAIPlayer;
@@ -26,7 +29,6 @@ public class SettingActivity extends AppCompatActivity {
     private SettingAdapter settingAdapter;
     private RecyclerView.LayoutManager layoutManager;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,10 +41,11 @@ public class SettingActivity extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
+
         String[] playersName = {
-                RandomAIPlayer.class.getSimpleName(),
-                MiniMaxAIPlayer.class.getSimpleName(),
-                MachineLearningAIPlayer.class.getSimpleName()
+                RandomAIPlayer.NAME,
+                MiniMaxAIPlayer.NAME,
+                MachineLearningAIPlayer.NAME,
         };
 
         // specify an adapter (see also next example)
@@ -73,7 +76,13 @@ public class SettingActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-            viewHolder.name.setText(names[i]);
+            String name = names[i];
+            viewHolder.name.setText(name);
+            if (name.equals(SharedPreferencesHelper.getAIPlayer(SettingActivity.this).getName())) {
+                viewHolder.tickImage.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.tickImage.setVisibility(View.INVISIBLE);
+            }
         }
 
         @Override
@@ -86,10 +95,23 @@ public class SettingActivity extends AppCompatActivity {
             @BindView(R.id.name)
             TextView name;
 
+            @BindView(R.id.tick)
+            ImageView tickImage;
+
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
                 ButterKnife.bind(this, itemView);
+                itemView.setOnClickListener(onClickListener);
             }
+
+            View.OnClickListener onClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int aiPlayerValue = Utils.getAIPlayerValue(name.getText().toString());
+                    SharedPreferencesHelper.setAIPlayer(SettingActivity.this, aiPlayerValue);
+                    settingAdapter.notifyDataSetChanged();
+                }
+            };
         }
 
     }

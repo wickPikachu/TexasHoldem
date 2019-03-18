@@ -22,6 +22,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
 import hk.edu.cityu.cs.fyp.texasholdem.db.GameLog;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.SharedPreferencesHelper;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 import hk.edu.cityu.cs.fyp.texasholdem.model.AIPlayer;
 import hk.edu.cityu.cs.fyp.texasholdem.model.RandomAIPlayer;
@@ -95,8 +96,13 @@ public class GameActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         // from shared preference get AI player level
-        aiPlayer = Utils.getAIPlayer(this);
-        computerNameText.setText(aiPlayer.getClass().getSimpleName() + ":");
+        aiPlayer = SharedPreferencesHelper.getAIPlayer(this);
+        computerNameText.setText(aiPlayer.getName() + ":");
+        if (aiPlayer.getName().length() > RandomAIPlayer.NAME.length()) {
+            computerMoneyText.setTextSize(18);
+        } else {
+            computerMoneyText.setTextSize(20);
+        }
 
         // TODO: view texasHoldem to control DB
         gameViewModel = ViewModelProviders.of(this).get(GameViewModel.class);

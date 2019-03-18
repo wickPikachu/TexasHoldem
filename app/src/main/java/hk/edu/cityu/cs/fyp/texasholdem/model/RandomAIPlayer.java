@@ -6,6 +6,8 @@ import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
 
 public class RandomAIPlayer extends AIPlayer {
 
+    public static final String NAME = "Random AIPlayer";
+
     private Random random;
 
     public RandomAIPlayer() {
@@ -30,5 +32,10 @@ public class RandomAIPlayer extends AIPlayer {
             case 2:
                 texasHoldem.computerCall();
         }
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

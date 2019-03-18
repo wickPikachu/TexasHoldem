@@ -2,6 +2,8 @@ package hk.edu.cityu.cs.fyp.texasholdem.model;
 
 public class MiniMaxAIPlayer extends AIPlayer {
 
+    public static final String NAME = "MiniMax AIPlayer";
+
     double Pr2 = 4;
     double Pr3 = 4;
     double Pr4 = 4;
@@ -67,6 +69,11 @@ public class MiniMaxAIPlayer extends AIPlayer {
     @Override
     public void takeAction(TexasHoldem texasHoldem) {
         // TODO: actions
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
 }
