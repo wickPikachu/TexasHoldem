@@ -8,6 +8,8 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import hk.edu.cityu.cs.fyp.texasholdem.BuildConfig;
+
 
 public class NetworkHandler {
 
@@ -29,7 +31,7 @@ public class NetworkHandler {
 
     public static void sendStringRequest(String data, Response.Listener<String> onResponseListener, Response.ErrorListener onErrorResponseListener) {
         // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, "127.0.0.1", onResponseListener, onErrorResponseListener);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, BuildConfig.SERVER_URL, onResponseListener, onErrorResponseListener);
 
         // Add the request to the RequestQueue.
         ourInstance.queue.add(stringRequest);

@@ -11,7 +11,11 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            buildConfigField "String", "SERVER_URL", "http://127.0.0.1"
+        }
         release {
+            buildConfigField "String", "SERVER_URL", "http://127.0.0.1"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

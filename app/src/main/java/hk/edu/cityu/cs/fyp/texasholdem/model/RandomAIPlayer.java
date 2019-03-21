@@ -3,6 +3,7 @@ package hk.edu.cityu.cs.fyp.texasholdem.model;
 import java.util.Random;
 
 import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 
 public class RandomAIPlayer extends AIPlayer {
 
@@ -20,17 +21,26 @@ public class RandomAIPlayer extends AIPlayer {
 
     @Override
     public void takeAction(TexasHoldem texasHoldem) {
-        switch (random.nextInt(3)) {
-            case 0:
-                texasHoldem.computerFold();
-            case 1:
-                try {
-                    texasHoldem.computerRaise((random.nextInt(texasHoldem.getComputerMoney() / 100 - 1) + 1) * 100);
-                } catch (TexasHoldemException e) {
-                    e.printStackTrace();
-                }
-            case 2:
-                texasHoldem.computerCall();
+        int playerMoney = texasHoldem.getPlayerMoney();
+        int playerBets = texasHoldem.getPlayerBets();
+
+        // determine fold or not
+        if (Utils.getProbabilityOf(playerBets, playerMoney * 2, random)) {
+            texasHoldem.computerFold();
+            return;
+        }
+
+        // determine raise or not
+        if (Utils.getProbabilityOf(2)) {
+            try {
+                texasHoldem.computerRaise((random.nextInt(texasHoldem.getComputerMoney() / 100 - 1) + 1) * 100);
+            } catch (TexasHoldemException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // call
+            texasHoldem.computerCall();
+
         }
     }
 
