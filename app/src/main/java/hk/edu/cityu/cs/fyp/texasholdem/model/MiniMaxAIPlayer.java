@@ -21,10 +21,10 @@ public class MiniMaxAIPlayer extends AIPlayer {
     // Returns optimal value for
     // current player (Initially called
     // for root and maximizer)
-    static int minimax(int depth, int nodeIndex,
-                       Boolean maximizingPlayer,
-                       int values[], int alpha,
-                       int beta) {
+    public static int minimax(int depth, int nodeIndex,
+                              Boolean maximizingPlayer,
+                              int values[], int alpha,
+                              int beta) {
         // Terminating condition. i.e
         // leaf node is reached
         if (depth == 3)

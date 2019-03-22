@@ -7,10 +7,10 @@ public class CardDecisions {
 
     private static final int PAIR = 1000;
     private static final int TWO_PAIRS = 2000;
-    private static final int FULL_HOUSE = 6000;
     private static final int THREE_OF_A_KIND = 3000;
     private static final int STRAIGHT = 4000;
     private static final int FLUSH = 5000;
+    private static final int FULL_HOUSE = 6000;
     private static final int FOUR_OF_A_KIND = 7000;
     private static final int STRAIGHT_FLUSH = 8000;
     private static final int ROYAL_FLUSH = 9000;
@@ -19,7 +19,26 @@ public class CardDecisions {
     private static final int SHIFT_NUMBER = 4;
 
     enum CardGroup {
+        None(0),
+        Pair(1),
+        TwoPairs(1 << 1),
+        ThreeOfAKind(1 << 2),
+        Straight(1 << 3),
+        Flush(1 << 4),
+        FullHouse(1 << 5),
+        FourOfAKind(1 << 6),
+        StraightFlush(1 << 7),
+        RoyalFlush(1 << 8);
 
+        private int value;
+
+        CardGroup(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
     }
 
     // Diamonds, Clubs, Hearts, Spades
@@ -80,8 +99,31 @@ public class CardDecisions {
         cards = 0;
     }
 
-    public static long eval(long cards) {
-        return 0;
+    public static CardGroup eval(String[] cards) {
+        return eval(getCardsValues(cards));
+    }
+
+    public static CardGroup eval(long cards) {
+        if (isRoyalFlush(cards)) {
+            return CardGroup.RoyalFlush;
+        } else if (isStraightFlush(cards)) {
+            return CardGroup.StraightFlush;
+        } else if (isFourOfAKind(cards)) {
+            return CardGroup.FourOfAKind;
+        } else if (isFullHouse(cards)) {
+            return CardGroup.FullHouse;
+        } else if (isFlush(cards)) {
+            return CardGroup.Flush;
+        } else if (isStraight(cards)) {
+            return CardGroup.Straight;
+        } else if (isThreeOfAKind(cards)) {
+            return CardGroup.ThreeOfAKind;
+        } else if (isTwoPair(cards)) {
+            return CardGroup.TwoPairs;
+        } else if (isPair(cards)) {
+            return CardGroup.Pair;
+        }
+        return CardGroup.None;
     }
 
     public static boolean isPair(long cards) {
