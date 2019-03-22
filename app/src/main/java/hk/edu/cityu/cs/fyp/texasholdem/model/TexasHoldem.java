@@ -47,7 +47,7 @@ public class TexasHoldem {
         ComputerCalled,
         ComputerRaised,
         BothCalled,
-        RoundEnded
+        Ended,
     }
 
     private GameState gameState;
@@ -148,13 +148,38 @@ public class TexasHoldem {
         ++turn;
     }
 
+    public String[] getPlayerCards() {
+        ArrayList<String> tempList = new ArrayList<>();
+        tempList.addAll(playerCardList);
+        tempList.addAll(tableCardList);
+        return tempList.toArray(new String[0]);
+    }
+
+    public String[] getComputerCards() {
+        ArrayList<String> tempList = new ArrayList<>();
+        tempList.addAll(playerCardList);
+        tempList.addAll(tableCardList);
+        return tempList.toArray(new String[0]);
+    }
+
     /**
      * Round end
      */
     public void endRound() {
         actionHistory += "";
         gameLogResults += rounds + ":" + actionHistory + "|" + cardHistory + "|" + betsResult + "\n";
-        message = "This round winner is " ;
+//        message = "This round winner is ";
+        gameState = GameState.Ended;
+        // determine who are the winner;
+        CardDecisions.CardGroup playerCards = CardDecisions.eval(getPlayerCards());
+        CardDecisions.CardGroup computerCards = CardDecisions.eval(getComputerCards());
+        if (playerCards.getValue() > computerCards.getValue()) {
+            playerWin();
+        } else if (playerCards.getValue() < computerCards.getValue()) {
+            playerLose();
+        } else {
+            playerDraw();
+        }
 
         // insert to database
         if (isSaveLogs) {
@@ -242,18 +267,18 @@ public class TexasHoldem {
 
     private void playerWin() {
         playerBets += totalBets;
-        endRound();
+        message = "Player Win";
     }
 
     private void playerLose() {
         computerBets += totalBets;
-        endRound();
+        message = "Computer Win";
     }
 
     private void playerDraw() {
+        message = "Draw!";
         playerBets += totalBets / 2;
         computerBets += totalBets / 2;
-        endRound();
     }
 
     public boolean isPlayerTurn() {
@@ -266,6 +291,10 @@ public class TexasHoldem {
 
     public boolean isBothCalled() {
         return gameState == GameState.BothCalled;
+    }
+
+    public boolean isEnded() {
+        return gameState == GameState.Ended;
     }
 
     // Getters
