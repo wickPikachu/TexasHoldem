@@ -4,11 +4,16 @@ import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.NetworkHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,6 +24,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        // test network
+        NetworkHelper networkHelper = NetworkHelper.getInstance();
+        networkHelper.sendStringRequest("123", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, "onResponse: " + response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "onErrorResponse: " + error.getLocalizedMessage());
+            }
+        });
     }
 
     @OnClick(R.id.play)

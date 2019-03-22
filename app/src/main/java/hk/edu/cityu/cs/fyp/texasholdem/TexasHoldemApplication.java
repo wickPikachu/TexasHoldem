@@ -6,9 +6,8 @@ import android.content.SharedPreferences;
 
 import hk.edu.cityu.cs.fyp.texasholdem.db.TexasHoldemDataBase;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
-import hk.edu.cityu.cs.fyp.texasholdem.helper.NetworkHandler;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.NetworkHelper;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.SharedPreferencesHelper;
-import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 
 public class TexasHoldemApplication extends Application {
 
@@ -18,7 +17,7 @@ public class TexasHoldemApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        NetworkHandler.getInstance().init(this);
+        NetworkHelper.getInstance().init(this);
 
         db = Room.databaseBuilder(getApplicationContext(),
                 TexasHoldemDataBase.class, "database-name").build();

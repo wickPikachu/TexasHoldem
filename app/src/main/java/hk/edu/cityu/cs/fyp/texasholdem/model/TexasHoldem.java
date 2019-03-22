@@ -146,14 +146,14 @@ public class TexasHoldem {
         ++turn;
     }
 
-    public String[] getPlayerCards() {
+    public String[] getPlayerCardsWithTable() {
         ArrayList<String> tempList = new ArrayList<>();
         tempList.addAll(playerCardList);
         tempList.addAll(tableCardList);
         return tempList.toArray(new String[0]);
     }
 
-    public String[] getComputerCards() {
+    public String[] getComputerCardsWithTable() {
         ArrayList<String> tempList = new ArrayList<>();
         tempList.addAll(playerCardList);
         tempList.addAll(tableCardList);
@@ -169,11 +169,11 @@ public class TexasHoldem {
 //        message = "This round winner is ";
         gameState = GameState.Ended;
         // determine who are the winner;
-        Cards.Combination playerCards = Cards.eval(getPlayerCards());
-        Cards.Combination computerCards = Cards.eval(getComputerCards());
-        if (playerCards.getValue() > computerCards.getValue()) {
+        Cards playerCards = new Cards(getPlayerCardsWithTable());
+        Cards computerCards = new Cards(getPlayerCardsWithTable());
+        if (playerCards.compareTo(computerCards) > 0) {
             playerWin();
-        } else if (playerCards.getValue() < computerCards.getValue()) {
+        } else if (playerCards.compareTo(computerCards) < 0) {
             playerLose();
         } else {
             playerDraw();
