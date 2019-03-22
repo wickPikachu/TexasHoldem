@@ -99,6 +99,10 @@ public class CardDecisions {
         cards = 0;
     }
 
+    public static CardGroup eval(String[] cards) {
+        return eval(getCardsValues(cards));
+    }
+
     public static CardGroup eval(long cards) {
         if (isRoyalFlush(cards)) {
             return CardGroup.RoyalFlush;

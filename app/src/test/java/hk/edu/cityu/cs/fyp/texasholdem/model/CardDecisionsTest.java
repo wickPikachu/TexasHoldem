@@ -31,31 +31,19 @@ public class CardDecisionsTest {
     }
 
     @Test
-    public void addCard() {
-    }
-
-    @Test
-    public void clear() {
-    }
-
-    @Test
-    public void getValues1() {
-    }
-
-    @Test
-    public void addCard1() {
-    }
-
-    @Test
-    public void valueOfCard() {
-    }
-
-    @Test
     public void eval() {
-    }
+        String[] cards1 = {"s3", "d3", "d4", "d5", "d6"};
+        assertEquals(CardDecisions.CardGroup.Pair, CardDecisions.eval(cards1));
 
-    @Test
-    public void clear1() {
+        String[] cards2 = {"d2", "s2", "d4", "d5", "h6"};
+        assertEquals(CardDecisions.CardGroup.Pair, CardDecisions.eval(cards2));
+
+        String[] cards3 = {"sa", "ha", "hq", "dj", "dk"};
+        assertEquals(CardDecisions.CardGroup.Pair, CardDecisions.eval(cards3));
+
+        String[] cards4 = {"c3", "da", "ck", "c6", "c2", "d6"};
+        assertEquals(CardDecisions.CardGroup.Pair, CardDecisions.eval(cards4));
+
     }
 
     @Test
@@ -63,18 +51,22 @@ public class CardDecisionsTest {
         String[] cards1 = {"s3", "d3", "d4", "d5", "d6"};
         boolean actual1 = CardDecisions.isPair(cards1);
         assertEquals(true, actual1);
+        assertEquals(CardDecisions.CardGroup.Pair, CardDecisions.eval(cards1));
 
         String[] cards2 = {"d2", "s2", "d4", "d5", "h6"};
         boolean actual2 = CardDecisions.isPair(cards2);
         assertEquals(true, actual2);
+        assertEquals(CardDecisions.CardGroup.Pair, CardDecisions.eval(cards2));
 
         String[] cards3 = {"sa", "ha", "hq", "dj", "dk"};
         boolean actual3 = CardDecisions.isPair(cards3);
         assertEquals(true, actual3);
+        assertEquals(CardDecisions.CardGroup.Pair, CardDecisions.eval(cards3));
 
-        String[] cards4 = {"c3", "ca", "ck", "c6", "c2", "d6"};
+        String[] cards4 = {"c3", "da", "ck", "c6", "c2", "d6"};
         boolean actual4 = CardDecisions.isPair(cards4);
         assertEquals(true, actual4);
+        assertEquals(CardDecisions.CardGroup.Pair, CardDecisions.eval(cards4));
 
         String[] cards5 = {"ha", "da", "ca", "cj", "cq"};
         boolean actual5 = CardDecisions.isPair(cards5);
@@ -94,10 +86,12 @@ public class CardDecisionsTest {
         String[] cards1 = {"d2", "d3", "s2", "s3", "d6"};
         boolean actual1 = CardDecisions.isTwoPair(cards1);
         assertEquals(true, actual1);
+        assertEquals(CardDecisions.CardGroup.TwoPairs, CardDecisions.eval(cards1));
 
         String[] cards2 = {"da", "d2", "s2", "ha", "h6"};
         boolean actual2 = CardDecisions.isTwoPair(cards2);
         assertEquals(true, actual2);
+        assertEquals(CardDecisions.CardGroup.TwoPairs, CardDecisions.eval(cards2));
 
         String[] cards3 = {"sa", "ha", "hq", "sq", "da"};
         boolean actual3 = CardDecisions.isTwoPair(cards3);
@@ -125,14 +119,17 @@ public class CardDecisionsTest {
         String[] cards1 = {"d2", "d3", "s2", "h3", "c2"};
         boolean actual1 = CardDecisions.isFullHouse(cards1);
         assertEquals(true, actual1);
+        assertEquals(CardDecisions.CardGroup.FullHouse, CardDecisions.eval(cards1));
 
         String[] cards2 = {"da", "sa", "ca", "dk", "hk"};
         boolean actual2 = CardDecisions.isFullHouse(cards2);
         assertEquals(true, actual2);
+        assertEquals(CardDecisions.CardGroup.FullHouse, CardDecisions.eval(cards2));
 
         String[] cards3 = {"sa", "ha", "hq", "sq", "da"};
         boolean actual3 = CardDecisions.isFullHouse(cards3);
         assertEquals(true, actual3);
+        assertEquals(CardDecisions.CardGroup.FullHouse, CardDecisions.eval(cards3));
 
         String[] cards4 = {"c3", "ca", "ck", "c6", "c2", "d6"};
         boolean actual4 = CardDecisions.isFullHouse(cards4);
@@ -153,17 +150,20 @@ public class CardDecisionsTest {
 
     @Test
     public void isStraight() {
-        String[] cards1 = {"d2", "d3", "d4", "d5", "d6"};
+        String[] cards1 = {"d2", "d3", "d4", "d5", "c6"};
         boolean actual1 = CardDecisions.isStraight(cards1);
         assertEquals(true, actual1);
+        assertEquals(CardDecisions.CardGroup.Straight, CardDecisions.eval(cards1));
 
         String[] cards2 = {"d2", "d3", "d4", "d5", "h6"};
         boolean actual2 = CardDecisions.isStraight(cards2);
         assertEquals(true, actual2);
+        assertEquals(CardDecisions.CardGroup.Straight, CardDecisions.eval(cards2));
 
         String[] cards3 = {"st", "ha", "hq", "dj", "dk"};
         boolean actual3 = CardDecisions.isStraight(cards3);
         assertEquals(true, actual3);
+        assertEquals(CardDecisions.CardGroup.Straight, CardDecisions.eval(cards3));
 
         String[] cards4 = {"c3", "ca", "ck", "c6", "c2", "d6"};
         boolean actual4 = CardDecisions.isStraight(cards4);
@@ -203,14 +203,17 @@ public class CardDecisionsTest {
         String[] cards5 = {"ha", "da", "ca", "cj", "cq"};
         boolean actual5 = CardDecisions.isThreeOfAKind(cards5);
         assertEquals(true, actual5);
+        assertEquals(CardDecisions.CardGroup.ThreeOfAKind, CardDecisions.eval(cards5));
 
         String[] cards6 = {"c6", "d6", "s6", "c7"};
         boolean actual6 = CardDecisions.isThreeOfAKind(cards6);
         assertEquals(true, actual6);
+        assertEquals(CardDecisions.CardGroup.ThreeOfAKind, CardDecisions.eval(cards6));
 
         String[] cards7 = {"c2", "h2", "d2", "d7", "dk"};
         boolean actual7 = CardDecisions.isThreeOfAKind(cards7);
         assertEquals(true, actual7);
+        assertEquals(CardDecisions.CardGroup.ThreeOfAKind, CardDecisions.eval(cards7));
     }
 
     @Test
@@ -223,14 +226,17 @@ public class CardDecisionsTest {
         String[] cards1 = {"d2", "d3", "d4", "d5", "dk"};
         boolean actual1 = CardDecisions.isFlush(cards1);
         assertEquals(true, actual1);
+        assertEquals(CardDecisions.CardGroup.Flush, CardDecisions.eval(cards1));
 
         String[] cards2 = {"st", "s8", "sa", "s3", "s6"};
         boolean actual2 = CardDecisions.isFlush(cards2);
         assertEquals(true, actual2);
+        assertEquals(CardDecisions.CardGroup.Flush, CardDecisions.eval(cards2));
 
         String[] cards3 = {"h4", "h5", "h6", "h7", "h9"};
         boolean actual3 = CardDecisions.isFlush(cards3);
         assertEquals(true, actual3);
+        assertEquals(CardDecisions.CardGroup.Flush, CardDecisions.eval(cards3));
 
         String[] cards4 = {"c3", "ca", "ck", "d2", "d3"};
         boolean actual4 = CardDecisions.isFlush(cards4);
@@ -239,6 +245,7 @@ public class CardDecisionsTest {
         String[] cards5 = {"c3", "ca", "ck", "cj", "cq"};
         boolean actual5 = CardDecisions.isFlush(cards5);
         assertEquals(true, actual5);
+        assertEquals(CardDecisions.CardGroup.Flush, CardDecisions.eval(cards5));
 
         String[] cards6 = {"c6", "d6", "s6", "c6"};
         boolean actual6 = CardDecisions.isFlush(cards6);
@@ -258,18 +265,22 @@ public class CardDecisionsTest {
         String[] cards1 = {"d2", "s2", "c2", "h2", "dk"};
         boolean actual1 = CardDecisions.isFourOfAKind(cards1);
         assertEquals(true, actual1);
+        assertEquals(CardDecisions.CardGroup.FourOfAKind, CardDecisions.eval(cards1));
 
         String[] cards2 = {"d3", "s3", "c3", "h3", "s6"};
         boolean actual2 = CardDecisions.isFourOfAKind(cards2);
         assertEquals(true, actual2);
+        assertEquals(CardDecisions.CardGroup.FourOfAKind, CardDecisions.eval(cards2));
 
         String[] cards3 = {"d4", "s4", "c4", "h4", "h6"};
         boolean actual3 = CardDecisions.isFourOfAKind(cards3);
         assertEquals(true, actual3);
+        assertEquals(CardDecisions.CardGroup.FourOfAKind, CardDecisions.eval(cards3));
 
         String[] cards4 = {"c7", "d5", "s5", "c5", "h5",};
         boolean actual4 = CardDecisions.isFourOfAKind(cards4);
         assertEquals(true, actual4);
+        assertEquals(CardDecisions.CardGroup.FourOfAKind, CardDecisions.eval(cards4));
 
         String[] cards5 = {"ct", "cj", "cq", "ca", "ck"};
         boolean actual5 = CardDecisions.isFourOfAKind(cards5);
@@ -278,10 +289,12 @@ public class CardDecisionsTest {
         String[] cards6 = {"c6", "d6", "s6", "h6"};
         boolean actual6 = CardDecisions.isFourOfAKind(cards6);
         assertEquals(true, actual6);
+        assertEquals(CardDecisions.CardGroup.FourOfAKind, CardDecisions.eval(cards6));
 
         String[] cards7 = {"c7", "d7", "h7", "s7", "ck"};
         boolean actual7 = CardDecisions.isFourOfAKind(cards7);
         assertEquals(true, actual7);
+        assertEquals(CardDecisions.CardGroup.FourOfAKind, CardDecisions.eval(cards7));
 
         String[] cardsList = {"8", "9", "t", "j", "Q", "K", "A"};
         for (String c : cardsList) {
@@ -289,7 +302,9 @@ public class CardDecisionsTest {
             for (char suit : CardDecisions.cardSuitList) {
                 fourOfKindList.add(suit + c);
             }
-            assertEquals(true, CardDecisions.isFourOfAKind(fourOfKindList.toArray(new String[4])));
+            String[] cs = fourOfKindList.toArray(new String[4]);
+            assertEquals(true, CardDecisions.isFourOfAKind(cs));
+            assertEquals(CardDecisions.CardGroup.FourOfAKind, CardDecisions.eval(cs));
         }
     }
 
@@ -306,6 +321,7 @@ public class CardDecisionsTest {
         String[] cards2 = {"s2", "s3", "s4", "s5", "s6"};
         boolean actual2 = CardDecisions.isStraightFlush(cards2);
         assertEquals(true, actual2);
+        assertEquals(CardDecisions.CardGroup.StraightFlush, CardDecisions.eval(cards2));
 
         String[] cards3 = {"h2", "h3", "s4", "h5", "h6"};
         boolean actual3 = CardDecisions.isStraightFlush(cards3);
@@ -316,10 +332,12 @@ public class CardDecisionsTest {
         assertEquals(x << ((6 - 2) * 4), CardDecisions.getCardsValues(cards4));
         boolean actual4 = CardDecisions.isStraightFlush(cards4);
         assertEquals(true, actual4);
+        assertEquals(CardDecisions.CardGroup.StraightFlush, CardDecisions.eval(cards4));
 
-        String[] cards5 = {"ct", "cj", "cq", "ca", "ck"};
-        boolean actual5 = CardDecisions.isRoyalFlush(cards5);
+        String[] cards5 = {"ct", "cj", "cq", "c9", "ck"};
+        boolean actual5 = CardDecisions.isStraightFlush(cards5);
         assertEquals(true, actual5);
+        assertEquals(CardDecisions.CardGroup.StraightFlush, CardDecisions.eval(cards5));
     }
 
     @Test
@@ -327,17 +345,21 @@ public class CardDecisionsTest {
         String[] cards1 = {"dt", "dj", "dq", "da", "dk"};
         boolean actual1 = CardDecisions.isRoyalFlush(cards1);
         assertEquals(true, actual1);
+        assertEquals(CardDecisions.CardGroup.RoyalFlush, CardDecisions.eval(cards1));
 
         String[] cards2 = {"st", "sj", "sq", "sa", "sk"};
         boolean actual2 = CardDecisions.isRoyalFlush(cards2);
         assertEquals(true, actual2);
+        assertEquals(CardDecisions.CardGroup.RoyalFlush, CardDecisions.eval(cards2));
 
         String[] cards3 = {"ht", "hj", "hq", "ha", "hk"};
         boolean actual3 = CardDecisions.isRoyalFlush(cards3);
         assertEquals(true, actual3);
+        assertEquals(CardDecisions.CardGroup.RoyalFlush, CardDecisions.eval(cards3));
 
         String[] cards4 = {"ct", "cj", "cq", "ca", "ck"};
         boolean actual4 = CardDecisions.isRoyalFlush(cards4);
         assertEquals(true, actual4);
+        assertEquals(CardDecisions.CardGroup.RoyalFlush, CardDecisions.eval(cards4));
     }
 }
