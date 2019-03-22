@@ -1,45 +1,13 @@
 package hk.edu.cityu.cs.fyp.texasholdem.model;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class CardDecisions {
+import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 
-    private static final int PAIR = 1000;
-    private static final int TWO_PAIRS = 2000;
-    private static final int THREE_OF_A_KIND = 3000;
-    private static final int STRAIGHT = 4000;
-    private static final int FLUSH = 5000;
-    private static final int FULL_HOUSE = 6000;
-    private static final int FOUR_OF_A_KIND = 7000;
-    private static final int STRAIGHT_FLUSH = 8000;
-    private static final int ROYAL_FLUSH = 9000;
-
-    private static final int SHIFT_CLASS = 1;
-    private static final int SHIFT_NUMBER = 4;
-
-    enum CardGroup {
-        None(0),
-        Pair(1),
-        TwoPairs(1 << 1),
-        ThreeOfAKind(1 << 2),
-        Straight(1 << 3),
-        Flush(1 << 4),
-        FullHouse(1 << 5),
-        FourOfAKind(1 << 6),
-        StraightFlush(1 << 7),
-        RoyalFlush(1 << 8);
-
-        private int value;
-
-        CardGroup(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-    }
+public class Cards implements Comparable<Cards> {
 
     // Diamonds, Clubs, Hearts, Spades
     public static final List<Character> cardSuitList = new ArrayList<>();
@@ -65,16 +33,54 @@ public class CardDecisions {
         cardNumberList.add('a');
     }
 
+    enum Combination {
+        None(0),
+        Pair(1),
+        TwoPairs(1 << 1),
+        ThreeOfAKind(1 << 2),
+        Straight(1 << 3),
+        Flush(1 << 4),
+        FullHouse(1 << 5),
+        FourOfAKind(1 << 6),
+        StraightFlush(1 << 7),
+        RoyalFlush(1 << 8);
+
+        private int value;
+
+        Combination(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
+    private Combination combination;
+    // form (2 to A);
+    private int[] kicks = {0, 0, 0, 0, 0};
+
     // 0 0 0 0 | 0 0 0 0 | 0 0 0 0 | 0 0 0 0 | 0 0 0 0 | 0 0 0 0 | ... | 0 0 0 0 | 0 0 0 0
     //    A         K         Q         J         T         9      ...      3         2
-    private long cards = 0;
+    private long cards = 0L;
+    private long bestCards = 0L;
 
+    // use enum instead
     // straight_flush, four of a kind, flush, straight, three of a kind, full house, two pairs, pairs
     // 11111111
+    @Deprecated
     private long combinations = 0;
 
-    public long getValues() {
-        return 0;
+    public Cards(String[] cards) {
+        this.cards = getCardsValues(cards);
+    }
+
+    public Cards(long cards) {
+        this.cards = cards;
+    }
+
+    public long getCards() {
+        return cards;
     }
 
     public void addCard(String cardString) {
@@ -95,38 +101,47 @@ public class CardDecisions {
         return 1L << (cardNumberList.indexOf(cardNumber) * 4) << cardSuitList.indexOf(cardClass);
     }
 
-    public void clear() {
-        cards = 0;
-    }
-
-    public static CardGroup eval(String[] cards) {
-        return eval(getCardsValues(cards));
-    }
-
-    public static CardGroup eval(long cards) {
-        if (isRoyalFlush(cards)) {
-            return CardGroup.RoyalFlush;
-        } else if (isStraightFlush(cards)) {
-            return CardGroup.StraightFlush;
-        } else if (isFourOfAKind(cards)) {
-            return CardGroup.FourOfAKind;
-        } else if (isFullHouse(cards)) {
-            return CardGroup.FullHouse;
-        } else if (isFlush(cards)) {
-            return CardGroup.Flush;
-        } else if (isStraight(cards)) {
-            return CardGroup.Straight;
-        } else if (isThreeOfAKind(cards)) {
-            return CardGroup.ThreeOfAKind;
-        } else if (isTwoPair(cards)) {
-            return CardGroup.TwoPairs;
-        } else if (isPair(cards)) {
-            return CardGroup.Pair;
+    private static int countSameNum(long cards) {
+        int count = 0;
+        long tempCards = cards;
+        for (int i = 0; i < 4; i++) {
+            if ((tempCards & 0x1L) == 0x1L) {
+                ++count;
+            }
+            tempCards >>= 1;
         }
-        return CardGroup.None;
+        return count;
     }
 
-    public static boolean isPair(long cards) {
+    public Combination eval() {
+        if (isRoyalFlush()) {
+            return Combination.RoyalFlush;
+        } else if (isStraightFlush()) {
+            return Combination.StraightFlush;
+        } else if (isFourOfAKind()) {
+            return Combination.FourOfAKind;
+        } else if (isFullHouse()) {
+            return Combination.FullHouse;
+        } else if (isFlush()) {
+            return Combination.Flush;
+        } else if (isStraight()) {
+            return Combination.Straight;
+        } else if (isThreeOfAKind()) {
+            return Combination.ThreeOfAKind;
+        } else if (isTwoPair()) {
+            return Combination.TwoPairs;
+        } else if (isPair()) {
+            return Combination.Pair;
+        }
+        return Combination.None;
+    }
+
+    public static Combination eval(String[] cards) {
+        return new Cards(cards).eval();
+    }
+
+    public boolean isPair() {
+        long cards = this.cards;
         for (int i = 0; i < cardNumberList.size(); i++) {
             int countSameNum = 0;
             for (int j = 0; j < cardSuitList.size(); j++) {
@@ -142,23 +157,12 @@ public class CardDecisions {
         return false;
     }
 
-    private static int countSameNum(long cards) {
-        int count = 0;
-        long tempCards = cards;
-        for (int i = 0; i < 4; i++) {
-            if ((tempCards & 0x1L) == 0x1L) {
-                ++count;
-            }
-            tempCards >>= 1;
-        }
-        return count;
-    }
-
     public static boolean isPair(String[] cards) {
-        return isPair(getCardsValues(cards));
+        return new Cards(cards).isPair();
     }
 
-    public static boolean isTwoPair(long cards) {
+    public boolean isTwoPair() {
+        long cards = this.cards;
         int countPair = 0;
         for (int i = 0; i < cardNumberList.size(); i++) {
             if (countSameNum(cards) == 2) {
@@ -173,10 +177,11 @@ public class CardDecisions {
     }
 
     public static boolean isTwoPair(String[] cards) {
-        return isTwoPair(getCardsValues(cards));
+        return new Cards(cards).isTwoPair();
     }
 
-    public static boolean isFullHouse(long cards) {
+    public boolean isFullHouse() {
+        long cards = this.cards;
         int[] countSameArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         boolean hasThreeOfKind = false;
         boolean hasTwoPair = false;
@@ -198,10 +203,11 @@ public class CardDecisions {
     }
 
     public static boolean isFullHouse(String[] cards) {
-        return isFullHouse(getCardsValues(cards));
+        return new Cards(cards).isFullHouse();
     }
 
-    public static boolean isStraight(long cards) {
+    public boolean isStraight() {
+        long cards = this.cards;
         long straightValue = 0xFL;
         for (int i = 0; i < 9; i++) {
             long tempCards = cards >> (i * 4);
@@ -222,10 +228,11 @@ public class CardDecisions {
     }
 
     public static boolean isStraight(String[] cards) {
-        return isStraight(getCardsValues(cards));
+        return new Cards(cards).isStraight();
     }
 
-    public static boolean isThreeOfAKind(long cards) {
+    public boolean isThreeOfAKind() {
+        long cards = this.cards;
         for (int i = 0; i < cardNumberList.size(); i++) {
             int countSameNum = 0;
             for (int j = 0; j < cardSuitList.size(); j++) {
@@ -242,10 +249,11 @@ public class CardDecisions {
     }
 
     public static boolean isThreeOfAKind(String[] cards) {
-        return isThreeOfAKind(getCardsValues(cards));
+        return new Cards(cards).isThreeOfAKind();
     }
 
-    public static boolean isFlush(long cards) {
+    public boolean isFlush() {
+        long cards = this.cards;
         // check suits,
         // from 0 to 3 represent {Diamonds, Clubs, Hearts, Spades}
         long[] suitValues = {0x1L, 0x2L, 0x4L, 0x8L};
@@ -264,10 +272,11 @@ public class CardDecisions {
     }
 
     public static boolean isFlush(String[] cards) {
-        return isFlush(getCardsValues(cards));
+        return new Cards(cards).isFlush();
     }
 
-    public static boolean isFourOfAKind(long cards) {
+    public boolean isFourOfAKind() {
+        long cards = this.cards;
         long fourOfKindValue = 0xFL;
         // check from 2 to A, total 13 cards
         for (int num = 0; num < 13; num++) {
@@ -279,10 +288,11 @@ public class CardDecisions {
     }
 
     public static boolean isFourOfAKind(String[] cards) {
-        return isFourOfAKind(getCardsValues(cards));
+        return new Cards(cards).isFourOfAKind();
     }
 
-    public static boolean isStraightFlush(long cards) {
+    public boolean isStraightFlush() {
+        long cards = this.cards;
         // check from Diamonds, Clubs, Hearts, Spades,
         // and from {2,3,4,5,6} to {10,J,Q,K,A};
         long straightFlushValue = 0x11111L;
@@ -298,10 +308,10 @@ public class CardDecisions {
     }
 
     public static boolean isStraightFlush(String[] cards) {
-        return isStraightFlush(getCardsValues(cards));
+        return new Cards(cards).isStraightFlush();
     }
 
-    public static boolean isRoyalFlush(long cards) {
+    public boolean isRoyalFlush() {
 //        char[] suits = {'d', 'c', 'h', 's'};
 //        char[] nums = {'t', 'j', 'q', 'k', 'a'};
 //
@@ -316,6 +326,7 @@ public class CardDecisions {
 //        }
 //        return false;
 
+        long cards = this.cards;
         long royalFlush1 = 0x11111L << 32;
         long royalFlush2 = 0x11111L << 33;
         long royalFlush3 = 0x11111L << 34;
@@ -328,9 +339,51 @@ public class CardDecisions {
     }
 
     public static boolean isRoyalFlush(String[] cards) {
-        return isRoyalFlush(getCardsValues(cards));
+        return new Cards(cards).isRoyalFlush();
     }
 
     // TODO: get best list
+    public long getBestCards() {
+        return 0L;
+    }
 
+
+    public Combination getCombination() {
+        return combination;
+    }
+
+    public int[] getKicks() {
+        return kicks;
+    }
+
+    public void setKicks(int[] kicks) {
+        this.kicks = kicks;
+    }
+
+    public void setKicks(int position, int k) {
+        this.kicks[position] = k;
+    }
+
+    public void setKicks(int position, String cardString) {
+        setKicks(position, Utils.valueOfCard(cardString));
+    }
+
+    @Override
+    public int compareTo(@NonNull Cards cards) {
+        if (this.combination.getValue() > cards.combination.getValue()) {
+            return 1;
+        } else if (this.combination.getValue() < cards.getCombination().getValue()) {
+            return -1;
+        }
+
+        for (int i = 0; i < kicks.length; ++i) {
+            if (this.kicks[i] > cards.kicks[i]) {
+                return 1;
+            } else if (this.kicks[i] < cards.kicks[i]) {
+                return -1;
+            }
+        }
+
+        return 0;
+    }
 }

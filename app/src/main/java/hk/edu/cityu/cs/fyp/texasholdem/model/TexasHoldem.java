@@ -1,7 +1,5 @@
 package hk.edu.cityu.cs.fyp.texasholdem.model;
 
-import android.os.AsyncTask;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Stack;
@@ -119,8 +117,8 @@ public class TexasHoldem {
         playerMoney -= playerBets;
         computerMoney -= computerBets;
 
-        for (char c : CardDecisions.cardSuitList) {
-            for (char n : CardDecisions.cardNumberList) {
+        for (char c : Cards.cardSuitList) {
+            for (char n : Cards.cardNumberList) {
                 deck.add("" + c + n);
             }
         }
@@ -171,8 +169,8 @@ public class TexasHoldem {
 //        message = "This round winner is ";
         gameState = GameState.Ended;
         // determine who are the winner;
-        CardDecisions.CardGroup playerCards = CardDecisions.eval(getPlayerCards());
-        CardDecisions.CardGroup computerCards = CardDecisions.eval(getComputerCards());
+        Cards.Combination playerCards = Cards.eval(getPlayerCards());
+        Cards.Combination computerCards = Cards.eval(getComputerCards());
         if (playerCards.getValue() > computerCards.getValue()) {
             playerWin();
         } else if (playerCards.getValue() < computerCards.getValue()) {

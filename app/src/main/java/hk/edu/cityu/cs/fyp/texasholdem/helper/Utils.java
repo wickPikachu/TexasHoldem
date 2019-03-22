@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.util.Random;
 
+import hk.edu.cityu.cs.fyp.texasholdem.model.Cards;
 import hk.edu.cityu.cs.fyp.texasholdem.model.MachineLearningAIPlayer;
 import hk.edu.cityu.cs.fyp.texasholdem.model.MiniMaxAIPlayer;
 import hk.edu.cityu.cs.fyp.texasholdem.model.RandomAIPlayer;
@@ -28,19 +29,31 @@ public class Utils {
         }
     }
 
-    public static boolean getProbabilityOf(int denominator) {
-        return getProbabilityOf(denominator, random);
+    public static int suitOfCard(String cardString) {
+        cardString = cardString.toLowerCase();
+        char cardSuit = cardString.charAt(0);
+        return Cards.cardSuitList.indexOf(cardSuit);
     }
 
-    public static boolean getProbabilityOf(int denominator, Random random) {
-        return getProbabilityOf(1, denominator, random);
+    public static int valueOfCard(String cardString) {
+        cardString = cardString.toLowerCase();
+        char cardNumber = cardString.charAt(1);
+        return Cards.cardNumberList.indexOf(cardNumber);
     }
 
-    public static boolean getProbabilityOf(int numerator, int denominator) {
-        return getProbabilityOf(numerator, denominator, random);
+    public static boolean isPossibleOf(int denominator) {
+        return isPossibleOf(denominator, random);
     }
 
-    public static boolean getProbabilityOf(int numerator, int denominator, Random random) {
+    public static boolean isPossibleOf(int denominator, Random random) {
+        return isPossibleOf(1, denominator, random);
+    }
+
+    public static boolean isPossibleOf(int numerator, int denominator) {
+        return isPossibleOf(numerator, denominator, random);
+    }
+
+    public static boolean isPossibleOf(int numerator, int denominator, Random random) {
         return random.nextInt(denominator) < numerator;
     }
 
