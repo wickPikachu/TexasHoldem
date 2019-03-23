@@ -102,7 +102,7 @@ public class TexasHoldem {
 
         rounds += 1;
         isPlayerBuildBets = !isPlayerBuildBets;
-        message = "Round Start";
+        message = "Round " + rounds + "Start";
 
         // TODO: change who action first
         if (isPlayerBuildBets) {
@@ -117,8 +117,8 @@ public class TexasHoldem {
         playerMoney -= playerBets;
         computerMoney -= computerBets;
 
-        for (char c : Cards.cardSuitList) {
-            for (char n : Cards.cardNumberList) {
+        for (char c : Cards.CARD_SUIT_LIST) {
+            for (char n : Cards.CARD_NUMBER_LIST) {
                 deck.add("" + c + n);
             }
         }
@@ -139,25 +139,13 @@ public class TexasHoldem {
             tableCardList.add(deck.pop());
         } else if (tableCardList.size() == 5) {
             // TODO: decision who are winner
+            determineWinner();
+
         } else {    // table cards size is 3 or 4
             tableCardList.add(deck.pop());
         }
         actionHistory += "/";
         ++turn;
-    }
-
-    public String[] getPlayerCardsWithTable() {
-        ArrayList<String> tempList = new ArrayList<>();
-        tempList.addAll(playerCardList);
-        tempList.addAll(tableCardList);
-        return tempList.toArray(new String[0]);
-    }
-
-    public String[] getComputerCardsWithTable() {
-        ArrayList<String> tempList = new ArrayList<>();
-        tempList.addAll(playerCardList);
-        tempList.addAll(tableCardList);
-        return tempList.toArray(new String[0]);
     }
 
     /**
@@ -169,15 +157,7 @@ public class TexasHoldem {
 //        message = "This round winner is ";
         gameState = GameState.Ended;
         // determine who are the winner;
-        Cards playerCards = new Cards(getPlayerCardsWithTable());
-        Cards computerCards = new Cards(getPlayerCardsWithTable());
-        if (playerCards.compareTo(computerCards) > 0) {
-            playerWin();
-        } else if (playerCards.compareTo(computerCards) < 0) {
-            playerLose();
-        } else {
-            playerDraw();
-        }
+        determineWinner();
 
         // insert to database
         if (isSaveLogs) {
@@ -196,12 +176,13 @@ public class TexasHoldem {
         message = "You folded";
         actionHistory += "f";
         computerMoney += totalBets;
-//        endRound();
+        endRound();
     }
 
     public void playerCall() {
         message = "You called";
         actionHistory += "c";
+        gameState = GameState.PlayerCalled;
         int diff = computerBets - playerBets;
         if (diff > 0) {
             playerBets += diff;
@@ -209,6 +190,7 @@ public class TexasHoldem {
         }
         if (gameState == GameState.ComputerRaised || gameState == GameState.ComputerCalled) {
             gameState = GameState.BothCalled;
+            next();
         } else {
             gameState = GameState.PlayerCalled;
         }
@@ -219,7 +201,7 @@ public class TexasHoldem {
             message = "Your money do not enough";
             throw new TexasHoldemException(message);
         }
-        message = "You raised " + raiseBets + " dollar";
+        message = "You raised $" + raiseBets;
         playerMoney -= raiseBets;
         playerBets += raiseBets;
         actionHistory += "b" + raiseBets;
@@ -230,7 +212,7 @@ public class TexasHoldem {
         message = "Computer folded";
         actionHistory += "f";
         playerMoney += totalBets;
-//        endRound();
+        endRound();
     }
 
     public void computerCall() {
@@ -243,6 +225,7 @@ public class TexasHoldem {
         }
         if (gameState == GameState.PlayerRaised || gameState == GameState.PlayerCalled) {
             gameState = GameState.BothCalled;
+            next();
         } else {
             gameState = GameState.ComputerCalled;
         }
@@ -256,6 +239,7 @@ public class TexasHoldem {
         computerMoney -= raiseBets;
         computerBets += raiseBets;
         actionHistory += "b" + raiseBets;
+        message = "Computer raised $" + raiseBets;
         gameState = GameState.ComputerRaised;
     }
 
@@ -264,19 +248,45 @@ public class TexasHoldem {
     }
 
     private void playerWin() {
-        playerBets += totalBets;
-        message = "Player Win";
+        message = "Player Win!";
+        playerMoney += totalBets;
     }
 
     private void playerLose() {
-        computerBets += totalBets;
-        message = "Computer Win";
+        message = "Computer Win!";
+        computerMoney += totalBets;
     }
 
     private void playerDraw() {
         message = "Draw!";
-        playerBets += totalBets / 2;
-        computerBets += totalBets / 2;
+        playerMoney += totalBets / 2;
+        computerMoney += totalBets / 2;
+    }
+
+    private void determineWinner() {
+        Cards playerCards = new Cards(getPlayerCardsWithTable());
+        Cards computerCards = new Cards(getComputerCardsWithTable());
+        if (playerCards.compareTo(computerCards) > 0) {
+            playerWin();
+        } else if (playerCards.compareTo(computerCards) < 0) {
+            playerLose();
+        } else {
+            playerDraw();
+        }
+    }
+
+    public String[] getPlayerCardsWithTable() {
+        ArrayList<String> tempList = new ArrayList<>();
+        tempList.addAll(playerCardList);
+        tempList.addAll(tableCardList);
+        return tempList.toArray(new String[0]);
+    }
+
+    public String[] getComputerCardsWithTable() {
+        ArrayList<String> tempList = new ArrayList<>();
+        tempList.addAll(computerCardList);
+        tempList.addAll(tableCardList);
+        return tempList.toArray(new String[0]);
     }
 
     public boolean isPlayerTurn() {

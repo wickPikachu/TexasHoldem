@@ -6,16 +6,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.NetworkHelper;
 
 public class MainActivity extends AppCompatActivity {
+
+    @BindView(R.id.logs)
+    Button logsButton;
 
     public static final String TAG = "MainActivity";
 
@@ -24,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+//        logsButton.setVisibility(View.GONE);
 
         // test network
         NetworkHelper networkHelper = NetworkHelper.getInstance();
@@ -49,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.setting)
     public void onSettingClicked() {
         Intent intent = new Intent(this, SettingActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.logs)
+    public void onLogsClicked() {
+        Intent intent = new Intent(this, LogsActivity.class);
         startActivity(intent);
     }
 

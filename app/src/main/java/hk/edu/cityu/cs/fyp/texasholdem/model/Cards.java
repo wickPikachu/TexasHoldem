@@ -11,27 +11,28 @@ import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 public class Cards implements Comparable<Cards> {
 
     // Diamonds, Clubs, Hearts, Spades
-    public static final List<Character> cardSuitList = new ArrayList<>();
-    public static final List<Character> cardNumberList = new ArrayList<>();
+    public static final List<Character> CARD_SUIT_LIST = new ArrayList<>();
+    public static final List<Character> CARD_NUMBER_LIST = new ArrayList<>();
 
     static {
-        cardSuitList.add('d');
-        cardSuitList.add('c');
-        cardSuitList.add('h');
-        cardSuitList.add('s');
-        cardNumberList.add('2');
-        cardNumberList.add('3');
-        cardNumberList.add('4');
-        cardNumberList.add('5');
-        cardNumberList.add('6');
-        cardNumberList.add('7');
-        cardNumberList.add('8');
-        cardNumberList.add('9');
-        cardNumberList.add('t');
-        cardNumberList.add('j');
-        cardNumberList.add('q');
-        cardNumberList.add('k');
-        cardNumberList.add('a');
+        CARD_SUIT_LIST.add('d');
+        CARD_SUIT_LIST.add('c');
+        CARD_SUIT_LIST.add('h');
+        CARD_SUIT_LIST.add('s');
+        CARD_NUMBER_LIST.add('2');
+        CARD_NUMBER_LIST.add('3');
+        CARD_NUMBER_LIST.add('4');
+
+        CARD_NUMBER_LIST.add('5');
+        CARD_NUMBER_LIST.add('6');
+        CARD_NUMBER_LIST.add('7');
+        CARD_NUMBER_LIST.add('8');
+        CARD_NUMBER_LIST.add('9');
+        CARD_NUMBER_LIST.add('t');
+        CARD_NUMBER_LIST.add('j');
+        CARD_NUMBER_LIST.add('q');
+        CARD_NUMBER_LIST.add('k');
+        CARD_NUMBER_LIST.add('a');
     }
 
     enum Combination {
@@ -100,7 +101,7 @@ public class Cards implements Comparable<Cards> {
         cardString = cardString.toLowerCase();
         char cardClass = cardString.charAt(0);
         char cardNumber = cardString.charAt(1);
-        return 1L << (cardNumberList.indexOf(cardNumber) * 4) << cardSuitList.indexOf(cardClass);
+        return 1L << (CARD_NUMBER_LIST.indexOf(cardNumber) * 4) << CARD_SUIT_LIST.indexOf(cardClass);
     }
 
     private static int countSameNum(long cards) {
@@ -154,7 +155,7 @@ public class Cards implements Comparable<Cards> {
 
     public boolean isPair() {
         long cards = this.cards;
-        for (int num = cardNumberList.size(); num > 0; num--) {
+        for (int num = CARD_NUMBER_LIST.size(); num > 0; num--) {
             if (countSameNum(cards >> (4 * (num - 1))) == 2) {
                 kicks[0] = num;
                 // than get highest cards
@@ -177,7 +178,7 @@ public class Cards implements Comparable<Cards> {
         long cards = this.cards;
         int[] tempKicks = {0, 0, 0, 0, 0};
         int countPair = 0;
-        for (int num = cardNumberList.size(); num > 0; num--) {
+        for (int num = CARD_NUMBER_LIST.size(); num > 0; num--) {
             if (countSameNum(cards >> (4 * (num - 1))) == 2) {
                 tempKicks[countPair] = num;
                 ++countPair;
@@ -232,9 +233,9 @@ public class Cards implements Comparable<Cards> {
 
     public boolean isThreeOfAKind() {
         long cards = this.cards;
-        for (int i = 0; i < cardNumberList.size(); i++) {
+        for (int i = 0; i < CARD_NUMBER_LIST.size(); i++) {
             int countSameNum = 0;
-            for (int j = 0; j < cardSuitList.size(); j++) {
+            for (int j = 0; j < CARD_SUIT_LIST.size(); j++) {
                 if ((cards & 1L) == 1L) {
                     countSameNum++;
                 }

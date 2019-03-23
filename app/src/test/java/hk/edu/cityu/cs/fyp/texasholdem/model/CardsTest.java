@@ -10,24 +10,24 @@ public class CardsTest {
 
     @Test
     public void getValues() {
-        assertEquals('d', Cards.cardSuitList.get(0).charValue());
-        assertEquals('c', Cards.cardSuitList.get(1).charValue());
-        assertEquals('h', Cards.cardSuitList.get(2).charValue());
-        assertEquals('s', Cards.cardSuitList.get(3).charValue());
+        assertEquals('d', Cards.CARD_SUIT_LIST.get(0).charValue());
+        assertEquals('c', Cards.CARD_SUIT_LIST.get(1).charValue());
+        assertEquals('h', Cards.CARD_SUIT_LIST.get(2).charValue());
+        assertEquals('s', Cards.CARD_SUIT_LIST.get(3).charValue());
 
-        assertEquals('2', Cards.cardNumberList.get(0).charValue());
-        assertEquals('3', Cards.cardNumberList.get(1).charValue());
-        assertEquals('4', Cards.cardNumberList.get(2).charValue());
-        assertEquals('5', Cards.cardNumberList.get(3).charValue());
-        assertEquals('6', Cards.cardNumberList.get(4).charValue());
-        assertEquals('7', Cards.cardNumberList.get(5).charValue());
-        assertEquals('8', Cards.cardNumberList.get(6).charValue());
-        assertEquals('9', Cards.cardNumberList.get(7).charValue());
-        assertEquals('t', Cards.cardNumberList.get(8).charValue());
-        assertEquals('j', Cards.cardNumberList.get(9).charValue());
-        assertEquals('q', Cards.cardNumberList.get(10).charValue());
-        assertEquals('k', Cards.cardNumberList.get(11).charValue());
-        assertEquals('a', Cards.cardNumberList.get(12).charValue());
+        assertEquals('2', Cards.CARD_NUMBER_LIST.get(0).charValue());
+        assertEquals('3', Cards.CARD_NUMBER_LIST.get(1).charValue());
+        assertEquals('4', Cards.CARD_NUMBER_LIST.get(2).charValue());
+        assertEquals('5', Cards.CARD_NUMBER_LIST.get(3).charValue());
+        assertEquals('6', Cards.CARD_NUMBER_LIST.get(4).charValue());
+        assertEquals('7', Cards.CARD_NUMBER_LIST.get(5).charValue());
+        assertEquals('8', Cards.CARD_NUMBER_LIST.get(6).charValue());
+        assertEquals('9', Cards.CARD_NUMBER_LIST.get(7).charValue());
+        assertEquals('t', Cards.CARD_NUMBER_LIST.get(8).charValue());
+        assertEquals('j', Cards.CARD_NUMBER_LIST.get(9).charValue());
+        assertEquals('q', Cards.CARD_NUMBER_LIST.get(10).charValue());
+        assertEquals('k', Cards.CARD_NUMBER_LIST.get(11).charValue());
+        assertEquals('a', Cards.CARD_NUMBER_LIST.get(12).charValue());
 
         String[] _cards1 = {"s3", "d3", "d4", "d5", "d6"};
         Cards cards1 = new Cards(_cards1);
@@ -373,7 +373,7 @@ public class CardsTest {
         String[] cardsList = {"8", "9", "t", "j", "Q", "K", "A"};
         for (String c : cardsList) {
             ArrayList<String> fourOfKindList = new ArrayList<>();
-            for (char suit : Cards.cardSuitList) {
+            for (char suit : Cards.CARD_SUIT_LIST) {
                 fourOfKindList.add(suit + c);
             }
             String[] cs = fourOfKindList.toArray(new String[4]);

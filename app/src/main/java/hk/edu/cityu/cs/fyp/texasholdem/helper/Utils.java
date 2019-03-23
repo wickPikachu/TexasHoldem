@@ -33,13 +33,13 @@ public class Utils {
     public static int suitOfCard(String cardString) {
         cardString = cardString.toLowerCase();
         char cardSuit = cardString.charAt(0);
-        return Cards.cardSuitList.indexOf(cardSuit);
+        return Cards.CARD_SUIT_LIST.indexOf(cardSuit);
     }
 
     public static int valueOfCard(String cardString) {
         cardString = cardString.toLowerCase();
         char cardNumber = cardString.charAt(1);
-        return Cards.cardNumberList.indexOf(cardNumber);
+        return Cards.CARD_NUMBER_LIST.indexOf(cardNumber);
     }
 
     public static boolean isPossibleOf(int denominator) {

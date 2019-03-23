@@ -84,6 +84,11 @@ public class GameActivity extends AppCompatActivity {
     @BindView(R.id.computer_text)
     TextView computerNameText;
 
+    @BindView(R.id.computer_card1)
+    ImageView computerCardImage1;
+    @BindView(R.id.computer_card2)
+    ImageView computerCardImage2;
+
     GameViewModel gameViewModel;
     TexasHoldem texasHoldem;
     AIPlayer aiPlayer;
@@ -135,6 +140,15 @@ public class GameActivity extends AppCompatActivity {
             texasHoldem.next();
         }
 
+        if (texasHoldem.isEnded()) {
+            ArrayList<String> computerCardList = texasHoldem.getComputerCardList();
+            computerCardImage1.setImageResource(Utils.getDrawableResByString(this, computerCardList.get(0)));
+            computerCardImage2.setImageResource(Utils.getDrawableResByString(this, computerCardList.get(1)));
+        } else {
+            computerCardImage1.setImageResource(R.drawable.gray_back);
+            computerCardImage2.setImageResource(R.drawable.gray_back);
+        }
+
         roundText.setText(String.format("Round: %d", texasHoldem.getRounds()));
 
         myMoneyText.setText("$" + texasHoldem.getPlayerMoney());
@@ -157,6 +171,14 @@ public class GameActivity extends AppCompatActivity {
             foldButton.setEnabled(true);
             callButton.setEnabled(true);
             raiseButton.setEnabled(true);
+        }
+    }
+
+    @OnClick(R.id.message)
+    public void onMessageClicked() {
+        if (texasHoldem.isEnded()) {
+            texasHoldem.startRound();
+            updateUI();
         }
     }
 
@@ -244,6 +266,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
         raiseBetsEditText.setText("" + raiseBets);
+        raiseValueSeekBar.setProgress(raiseBets / texasHoldem.getPlayerMoney());
     }
 
 }

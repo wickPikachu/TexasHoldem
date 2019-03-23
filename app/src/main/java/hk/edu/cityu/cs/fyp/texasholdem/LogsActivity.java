@@ -1,14 +1,15 @@
 package hk.edu.cityu.cs.fyp.texasholdem;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import hk.edu.cityu.cs.fyp.texasholdem.model.MachineLearningAIPlayer;
-import hk.edu.cityu.cs.fyp.texasholdem.model.MiniMaxAIPlayer;
-import hk.edu.cityu.cs.fyp.texasholdem.model.RandomAIPlayer;
 
 public class LogsActivity extends AppCompatActivity {
 
@@ -24,9 +25,49 @@ public class LogsActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
 
+    }
 
+    class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.ViewHolder> {
 
+        private String[] names;
+
+        public LogsAdapter(String[] names) {
+            this.names = names;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_setting, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+            // TODO
+        }
+
+        @Override
+        public int getItemCount() {
+            return 3;
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                ButterKnife.bind(this, itemView);
+                itemView.setOnClickListener(onClickListener);
+            }
+
+            View.OnClickListener onClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                }
+            };
+        }
 
     }
+
 
 }

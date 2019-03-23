@@ -15,5 +15,8 @@
     <string name="minus1">-$100</string>
     <string name="add1">+$100</string>
     <string name="add2">+$200</string>
+    <string name="logs">Logs</string>
+    <string name="setting_activity">Setting</string>
+    <string name="logs_activity">Logs</string>
 
 </resources>

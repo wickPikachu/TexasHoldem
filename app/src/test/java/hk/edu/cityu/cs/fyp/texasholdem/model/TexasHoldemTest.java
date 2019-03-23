@@ -64,8 +64,8 @@ public class TexasHoldemTest {
         assertEquals(false, texasHoldem.isPlayerTurn());
 
         // next round
-        texasHoldem.next();
-        assertEquals(false, texasHoldem.isComputerTurn());
+        texasHoldem.startRound();
+        assertEquals(true, texasHoldem.isComputerTurn());
         assertEquals(false, texasHoldem.isPlayerTurn());
 
 
