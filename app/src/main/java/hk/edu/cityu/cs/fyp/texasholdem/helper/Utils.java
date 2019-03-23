@@ -2,6 +2,7 @@ package hk.edu.cityu.cs.fyp.texasholdem.helper;
 
 import android.content.Context;
 
+import java.util.List;
 import java.util.Random;
 
 import hk.edu.cityu.cs.fyp.texasholdem.model.Cards;
@@ -57,4 +58,11 @@ public class Utils {
         return random.nextInt(denominator) < numerator;
     }
 
+    public static int[] toIntArray(List<Integer> list) {
+        int[] array = new int[list.size()];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = list.get(i);
+        }
+        return array;
+    }
 }

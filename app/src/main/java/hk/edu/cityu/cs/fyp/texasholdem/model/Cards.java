@@ -3,6 +3,7 @@ package hk.edu.cityu.cs.fyp.texasholdem.model;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
@@ -57,13 +58,14 @@ public class Cards implements Comparable<Cards> {
     }
 
     private Combination combination;
+    private int combinationValue = 0;
     // form (2 to A);
     private int[] kicks = {0, 0, 0, 0, 0};
 
     // 0 0 0 0 | 0 0 0 0 | 0 0 0 0 | 0 0 0 0 | 0 0 0 0 | 0 0 0 0 | ... | 0 0 0 0 | 0 0 0 0
     //    A         K         Q         J         T         9      ...      3         2
     private long cards = 0L;
-    private long bestCards = 0L;
+    private long bestFiveCards = 0L;
 
     // use enum instead
     // straight_flush, four of a kind, flush, straight, three of a kind, full house, two pairs, pairs
@@ -113,44 +115,54 @@ public class Cards implements Comparable<Cards> {
         return count;
     }
 
-    public Combination eval() {
+    public Combination evaluate() {
         if (isRoyalFlush()) {
-            return Combination.RoyalFlush;
+            combination = Combination.RoyalFlush;
         } else if (isStraightFlush()) {
-            return Combination.StraightFlush;
+            combination = Combination.StraightFlush;
         } else if (isFourOfAKind()) {
-            return Combination.FourOfAKind;
+            combination = Combination.FourOfAKind;
         } else if (isFullHouse()) {
-            return Combination.FullHouse;
+            combination = Combination.FullHouse;
         } else if (isFlush()) {
-            return Combination.Flush;
+            combination = Combination.Flush;
         } else if (isStraight()) {
-            return Combination.Straight;
+            combination = Combination.Straight;
         } else if (isThreeOfAKind()) {
-            return Combination.ThreeOfAKind;
+            combination = Combination.ThreeOfAKind;
         } else if (isTwoPair()) {
-            return Combination.TwoPairs;
+            combination = Combination.TwoPairs;
         } else if (isPair()) {
-            return Combination.Pair;
+            combination = Combination.Pair;
+        } else {
+            combination = Combination.None;
         }
-        return Combination.None;
+        return combination;
     }
 
-    public static Combination eval(String[] cards) {
-        return new Cards(cards).eval();
+    public static Combination evaluate(String[] cards) {
+        return new Cards(cards).evaluate();
+    }
+
+    public static boolean isNone(String[] cards) {
+        return new Cards(cards).isNone();
+    }
+
+    public boolean isNone() {
+        return this.evaluate() == Combination.None;
     }
 
     public boolean isPair() {
         long cards = this.cards;
-        for (int i = 0; i < cardNumberList.size(); i++) {
-            int countSameNum = 0;
-            for (int j = 0; j < cardSuitList.size(); j++) {
-                if ((cards & 1L) == 1L) {
-                    countSameNum++;
-                }
-                cards >>= 1;
-            }
-            if (countSameNum == 2) {
+        for (int num = cardNumberList.size(); num > 0; num--) {
+            if (countSameNum(cards >> (4 * (num - 1))) == 2) {
+                kicks[0] = num;
+                // than get highest cards
+                cards &= ~(0xFL << ((kicks[0] - 1) * 4));
+                int[] highestCardValues = getHighestCardValues(cards);
+                kicks[1] = highestCardValues[0];
+                kicks[2] = highestCardValues[1];
+                kicks[3] = highestCardValues[2];
                 return true;
             }
         }
@@ -163,47 +175,28 @@ public class Cards implements Comparable<Cards> {
 
     public boolean isTwoPair() {
         long cards = this.cards;
+        int[] tempKicks = {0, 0, 0, 0, 0};
         int countPair = 0;
-        for (int i = 0; i < cardNumberList.size(); i++) {
-            if (countSameNum(cards) == 2) {
+        for (int num = cardNumberList.size(); num > 0; num--) {
+            if (countSameNum(cards >> (4 * (num - 1))) == 2) {
+                tempKicks[countPair] = num;
                 ++countPair;
                 if (countPair == 2) {
+                    kicks = tempKicks;
+                    // remove two pairs values from cards
+                    // than get highest cards
+                    cards &= ~(0xFL << ((kicks[0] - 1) * 4));
+                    cards &= ~(0xFL << ((kicks[1] - 1) * 4));
+                    kicks[2] = getHighestCardValues(cards)[0];
                     return true;
                 }
             }
-            cards >>= 4;
         }
         return false;
     }
 
     public static boolean isTwoPair(String[] cards) {
         return new Cards(cards).isTwoPair();
-    }
-
-    public boolean isFullHouse() {
-        long cards = this.cards;
-        int[] countSameArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        boolean hasThreeOfKind = false;
-        boolean hasTwoPair = false;
-        int threeOfKindValue = -1;
-        int twoPairValue = -1;
-        for (int i = 0; i < countSameArray.length; i++) {
-            countSameArray[i] = countSameNum(cards);
-            if (countSameArray[i] == 3 & countSameArray[i] > threeOfKindValue) {
-                hasThreeOfKind = true;
-                threeOfKindValue = i;
-            } else if (countSameArray[i] == 2 && countSameArray[i] > twoPairValue) {
-                hasTwoPair = true;
-                twoPairValue = i;
-            }
-            cards >>= 4;
-        }
-
-        return hasThreeOfKind && hasTwoPair;
-    }
-
-    public static boolean isFullHouse(String[] cards) {
-        return new Cards(cards).isFullHouse();
     }
 
     public boolean isStraight() {
@@ -224,6 +217,12 @@ public class Cards implements Comparable<Cards> {
                 break;
             }
         }
+
+        // check A,2,3,4,5
+        if ((cards & 0xFL) > 0 && (cards >> 4 & 0xFL) > 0 && (cards >> 8 & 0xFL) > 0 && (cards >> 12 & 0xFL) > 0 && (cards >> 48 & 0xFL) > 0) {
+            return true;
+        }
+
         return false;
     }
 
@@ -256,32 +255,101 @@ public class Cards implements Comparable<Cards> {
         long cards = this.cards;
         // check suits,
         // from 0 to 3 represent {Diamonds, Clubs, Hearts, Spades}
-        long[] suitValues = {0x1L, 0x2L, 0x4L, 0x8L};
+        final long[] suitValues = {0x1L, 0x2L, 0x4L, 0x8L};
+        ArrayList<Integer> diamonds = new ArrayList<>();
+        ArrayList<Integer> clubs = new ArrayList<>();
+        ArrayList<Integer> hearts = new ArrayList<>();
+        ArrayList<Integer> spades = new ArrayList<>();
         for (long suitValue : suitValues) {
-            int countSameSuit = 0;
             long tempCards = cards;
-            for (int j = 0; j < 13; j++) {
-                if ((tempCards & suitValue) == suitValue)
-                    countSameSuit++;
+            for (int num = 1; num <= 13; num++) {
+                if ((tempCards & suitValue) == suitValue) {
+                    if (suitValue == suitValues[0]) {
+                        diamonds.add(num);
+                    } else if (suitValue == suitValues[1]) {
+                        clubs.add(num);
+                    } else if (suitValue == suitValues[2]) {
+                        hearts.add(num);
+                    } else {
+                        spades.add(num);
+                    }
+                }
                 tempCards >>= 4;
             }
-            if (countSameSuit >= 5)
-                return true;
+        }
+        if (diamonds.size() >= 5) {
+            setKicksFromSuitList(diamonds);
+            return true;
+        }
+        if (clubs.size() >= 5) {
+            setKicksFromSuitList(clubs);
+            return true;
+        }
+        if (hearts.size() >= 5) {
+            setKicksFromSuitList(hearts);
+            return true;
+        }
+        if (spades.size() >= 5) {
+            setKicksFromSuitList(spades);
+            return true;
         }
         return false;
+    }
+
+    private void setKicksFromSuitList(ArrayList<Integer> suitList) {
+        Collections.sort(suitList);
+        for (int i = suitList.size(); i > 0; i--) {
+            kicks[suitList.size() - i] = suitList.get(i - 1);
+        }
     }
 
     public static boolean isFlush(String[] cards) {
         return new Cards(cards).isFlush();
     }
 
+    public boolean isFullHouse() {
+        long cards = this.cards;
+        int[] countSameArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        boolean hasThreeOfKind = false;
+        boolean hasPair = false;
+        int threeOfKindValue = -1;
+        int pairValue = -1;
+        for (int i = 0; i < countSameArray.length; i++) {
+            countSameArray[i] = countSameNum(cards);
+            if (countSameArray[i] == 3 & countSameArray[i] > threeOfKindValue) {
+                hasThreeOfKind = true;
+                threeOfKindValue = i;
+            } else if (countSameArray[i] == 2 && countSameArray[i] > pairValue) {
+                hasPair = true;
+                pairValue = i;
+            }
+            cards >>= 4;
+        }
+
+        if (hasThreeOfKind && hasPair) {
+            kicks[0] = threeOfKindValue;
+            kicks[1] = pairValue;
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isFullHouse(String[] cards) {
+        return new Cards(cards).isFullHouse();
+    }
+
     public boolean isFourOfAKind() {
         long cards = this.cards;
         long fourOfKindValue = 0xFL;
         // check from 2 to A, total 13 cards
-        for (int num = 0; num < 13; num++) {
-            if ((cards & fourOfKindValue) == fourOfKindValue)
+        for (int num = 1; num <= 13; num++) {
+            if ((cards & fourOfKindValue) == fourOfKindValue) {
+                kicks[0] = num;
+                // remove fourOfKindCards;
+                cards &= ~(0xFL << ((num - 1) * 4));
+                kicks[1] = getHighestCardValues(cards)[0];
                 return true;
+            }
             fourOfKindValue <<= 4;
         }
         return false;
@@ -294,15 +362,28 @@ public class Cards implements Comparable<Cards> {
     public boolean isStraightFlush() {
         long cards = this.cards;
         // check from Diamonds, Clubs, Hearts, Spades,
-        // and from {2,3,4,5,6} to {10,J,Q,K,A};
-        long straightFlushValue = 0x11111L;
+        // and from {10,J,Q,K,A} to {2,3,4,5,6}
+        long straightFlushValue = 0x88888L << (8 * 4);
         // TODO: straight flush value
-        for (int num = 2; num <= 10; num++) {
+        // 23456, 34567, 45678, 56789, 6789t, 789tj, 89tjq, 9tjqk, tjqka
+        //  5, 6, 7,8,9,10,11,12
+        for (int num = 13; num >= 5; num--) {
             for (int suit = 0; suit < 4; suit++) {
-                if ((cards & straightFlushValue) == straightFlushValue)
+                if ((cards & straightFlushValue) == straightFlushValue) {
+                    kicks[0] = num;
                     return true;
-                straightFlushValue <<= 1;
+                }
+                straightFlushValue >>= 1;
             }
+        }
+        // check A,2,3,4,5
+        long smallerStraightFlushValue = 0x1000000001111L;
+        for (int suit = 0; suit < 4; suit++) {
+            if ((cards & smallerStraightFlushValue) == smallerStraightFlushValue) {
+                kicks[0] = 4;   // card number is 5
+                return true;
+            }
+            smallerStraightFlushValue <<= 1;
         }
         return false;
     }
@@ -343,7 +424,7 @@ public class Cards implements Comparable<Cards> {
     }
 
     // TODO: get best list
-    public long getBestCards() {
+    public long getBestFiveCards() {
         return 0L;
     }
 
@@ -370,6 +451,8 @@ public class Cards implements Comparable<Cards> {
 
     @Override
     public int compareTo(@NonNull Cards cards) {
+        this.evaluate();
+        cards.evaluate();
         if (this.combination.getValue() > cards.combination.getValue()) {
             return 1;
         } else if (this.combination.getValue() < cards.getCombination().getValue()) {
@@ -385,5 +468,20 @@ public class Cards implements Comparable<Cards> {
         }
 
         return 0;
+    }
+
+    private int[] getHighestCardValues(long cards) {
+        ArrayList<Integer> highestCardArray = new ArrayList<>();
+        // from 'A"
+        for (int num = 13; num >= 1; num--) {
+            if (((cards >> (num - 1) * 4) & 0xFL) > 0L) {
+                highestCardArray.add(num);
+            }
+        }
+        int[] result = Utils.toIntArray(highestCardArray);
+        if (result.length == 0) {
+            return new int[]{0};
+        }
+        return result;
     }
 }
