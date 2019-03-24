@@ -14,7 +14,7 @@ public class GameViewModel extends ViewModel {
 
     public LiveData<List<GameLog>> getUnsyncResult() {
         if (resultsLive == null) {
-            resultsLive = TexasHoldemApplication.db.getResultDao().findUnsyncResults();
+            resultsLive = TexasHoldemApplication.db.getResultDao().findUnsyncGameLogs();
         }
         return resultsLive;
     }

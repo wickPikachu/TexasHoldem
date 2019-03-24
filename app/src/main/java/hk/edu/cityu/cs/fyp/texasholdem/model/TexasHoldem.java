@@ -15,9 +15,9 @@ public class TexasHoldem {
     // bitwise for actions:
     //      raise bit, call bit, fold bit
     //          0         0         0
-    public static final int ACTION_FOLD_BIT = 1;
-    public static final int ACTION_CALL_BIT = 1 << 1;
-    public static final int ACTION_RAISE_BIT = 1 << 2;
+//    public static final int ACTION_FOLD_BIT = 1;
+//    public static final int ACTION_CALL_BIT = 1 << 1;
+//    public static final int ACTION_RAISE_BIT = 1 << 2;
 
     private static final TexasHoldem ourInstance = new TexasHoldem();
 
@@ -102,7 +102,7 @@ public class TexasHoldem {
 
         rounds += 1;
         isPlayerBuildBets = !isPlayerBuildBets;
-        message = "Round " + rounds + "Start";
+        message = "Round " + rounds + " start";
 
         // TODO: change who action first
         if (isPlayerBuildBets) {
@@ -138,9 +138,7 @@ public class TexasHoldem {
             tableCardList.add(deck.pop());
             tableCardList.add(deck.pop());
         } else if (tableCardList.size() == 5) {
-            // TODO: decision who are winner
             determineWinner();
-
         } else {    // table cards size is 3 or 4
             tableCardList.add(deck.pop());
         }
@@ -156,15 +154,13 @@ public class TexasHoldem {
         gameLogResults += rounds + ":" + actionHistory + "|" + cardHistory + "|" + betsResult + "\n";
 //        message = "This round winner is ";
         gameState = GameState.Ended;
-        // determine who are the winner;
-        determineWinner();
 
         // insert to database
         if (isSaveLogs) {
             Thread t = new Thread() {
                 public void run() {
                     GameLog gameLog = new GameLog();
-                    gameLog.setResult("test");
+                    gameLog.setResult(actionHistory);
                     TexasHoldemApplication.db.getResultDao().insert(gameLog);
                 }
             };
@@ -182,7 +178,6 @@ public class TexasHoldem {
     public void playerCall() {
         message = "You called";
         actionHistory += "c";
-        gameState = GameState.PlayerCalled;
         int diff = computerBets - playerBets;
         if (diff > 0) {
             playerBets += diff;
@@ -190,7 +185,6 @@ public class TexasHoldem {
         }
         if (gameState == GameState.ComputerRaised || gameState == GameState.ComputerCalled) {
             gameState = GameState.BothCalled;
-            next();
         } else {
             gameState = GameState.PlayerCalled;
         }
@@ -198,7 +192,7 @@ public class TexasHoldem {
 
     public void playerRaise(int raiseBets) throws TexasHoldemException {
         if (playerMoney < raiseBets) {
-            message = "Your money do not enough";
+            message = "Your money do not enough!";
             throw new TexasHoldemException(message);
         }
         message = "You raised $" + raiseBets;
@@ -225,7 +219,6 @@ public class TexasHoldem {
         }
         if (gameState == GameState.PlayerRaised || gameState == GameState.PlayerCalled) {
             gameState = GameState.BothCalled;
-            next();
         } else {
             gameState = GameState.ComputerCalled;
         }
@@ -233,7 +226,7 @@ public class TexasHoldem {
 
     public void computerRaise(int raiseBets) throws TexasHoldemException {
         if (computerMoney < raiseBets) {
-            message = "Computer money do not enough";
+            message = "Computer money do not enough!";
             throw new TexasHoldemException(message);
         }
         computerMoney -= raiseBets;
@@ -263,16 +256,21 @@ public class TexasHoldem {
         computerMoney += totalBets / 2;
     }
 
-    private void determineWinner() {
+    public void determineWinner() {
         Cards playerCards = new Cards(getPlayerCardsWithTable());
         Cards computerCards = new Cards(getComputerCardsWithTable());
         if (playerCards.compareTo(computerCards) > 0) {
-            playerWin();
+            message = "Player Win! (" + playerCards.getCombination().name() + ")";
+            playerMoney += totalBets;
         } else if (playerCards.compareTo(computerCards) < 0) {
-            playerLose();
+            message = "Computer Win! (" + computerCards.getCombination().name() + ")";
+            computerMoney += totalBets;
         } else {
-            playerDraw();
+            message = "Draw! (" + playerCards.getCombination().name() + ")";
+            playerMoney += totalBets / 2;
+            computerMoney += totalBets / 2;
         }
+        endRound();
     }
 
     public String[] getPlayerCardsWithTable() {

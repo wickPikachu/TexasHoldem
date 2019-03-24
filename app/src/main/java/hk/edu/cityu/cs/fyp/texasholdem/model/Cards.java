@@ -137,6 +137,10 @@ public class Cards implements Comparable<Cards> {
             combination = Combination.Pair;
         } else {
             combination = Combination.None;
+            int[] highestCardValues = getHighestCardValues(cards);
+            for (int i = 0; i < kicks.length; i++) {
+                kicks[i] = highestCardValues[i];
+            }
         }
         return combination;
     }
@@ -233,15 +237,15 @@ public class Cards implements Comparable<Cards> {
 
     public boolean isThreeOfAKind() {
         long cards = this.cards;
-        for (int i = 0; i < CARD_NUMBER_LIST.size(); i++) {
-            int countSameNum = 0;
-            for (int j = 0; j < CARD_SUIT_LIST.size(); j++) {
-                if ((cards & 1L) == 1L) {
-                    countSameNum++;
-                }
-                cards >>= 1;
-            }
-            if (countSameNum == 3) {
+        for (int num = CARD_NUMBER_LIST.size(); num > 0; num--) {
+            if (countSameNum(cards >> (4 * (num - 1))) == 3) {
+                kicks[0] = num;
+                // remove two pairs values from cards
+                // than get highest cards
+                cards &= ~(0xFL << ((kicks[0] - 1) * 4));
+                int[] highestCardValues = getHighestCardValues(cards);
+                kicks[1] = highestCardValues[0];
+                kicks[2] = highestCardValues[1];
                 return true;
             }
         }

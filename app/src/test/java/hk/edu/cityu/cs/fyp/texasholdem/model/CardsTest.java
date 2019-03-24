@@ -35,7 +35,17 @@ public class CardsTest {
     }
 
     @Test
-    public void testCompareTo(){
+    public void testCompareTo() {
+        // none
+        Cards cardsA1_ = new Cards(new String[]{"s3", "d7", "d4", "da", "dk", "s2", "st"});
+        Cards cardsB1_ = new Cards(new String[]{"s2", "dq", "d4", "h9", "d6", "sa", "ht"});
+        assertEquals(1, cardsA1_.compareTo(cardsB1_));
+
+        Cards cardsA2_ = new Cards(new String[]{"s2", "dj", "d5", "s9", "d6", "sa", "ht"});
+        Cards cardsB2_ = new Cards(new String[]{"s2", "dj", "d3", "h9", "d6", "sa", "st"});
+        assertEquals(0, cardsA2_.compareTo(cardsB2_));
+
+        // pair
         Cards cardsA1 = new Cards(new String[]{"s3", "d3", "d4", "d8", "d6", "s2", "st"});
         Cards cardsB1 = new Cards(new String[]{"s2", "d2", "d4", "h9", "d6", "sa", "ht"});
         assertEquals(1, cardsA1.compareTo(cardsB1));
@@ -44,6 +54,7 @@ public class CardsTest {
         Cards cardsB2 = new Cards(new String[]{"c3", "h3", "c4", "c5", "ha", "sa", "st"});
         assertEquals(0, cardsA2.compareTo(cardsB2));
 
+        // two pair
         Cards cardsA3 = new Cards(new String[]{"s3", "sk", "sq", "sj", "da", "sa", "st"});
         Cards cardsB3 = new Cards(new String[]{"c3", "h3", "c4", "c5", "sa", "sa", "st"});
         assertEquals(1, cardsA3.compareTo(cardsB3));
@@ -56,9 +67,23 @@ public class CardsTest {
         Cards cardsB5 = new Cards(new String[]{"c3", "hk", "dk", "ck", "sk", "sa", "st"});
         assertEquals(-1, cardsA5.compareTo(cardsB5));
 
+        // four of a kind
         Cards cardsA6 = new Cards(new String[]{"c3", "hk", "dk", "ck", "sk", "sa", "st"});
         Cards cardsB6 = new Cards(new String[]{"c3", "hk", "dk", "ck", "sk", "s2", "st"});
         assertEquals(1, cardsA6.compareTo(cardsB6));
+
+        Cards cardsA7 = new Cards(new String[]{"c3", "hk", "dk", "ck", "sk", "sa", "st"});
+        Cards cardsB7 = new Cards(new String[]{"c3", "hk", "dk", "ck", "sk", "ha", "sq"});
+        assertEquals(0, cardsA7.compareTo(cardsB7));
+
+        // three of a kind
+        Cards cardsA8 = new Cards(new String[]{"c3", "d8", "s6", "c2", "ha", "sa", "da"});
+        Cards cardsB8 = new Cards(new String[]{"c3", "hk", "dk", "ck", "s8", "s2", "st"});
+        assertEquals(1, cardsA8.compareTo(cardsB8));
+
+        Cards cardsA9 = new Cards(new String[]{"c3", "hk", "dk", "ck", "c9", "sa", "st"});
+        Cards cardsB9 = new Cards(new String[]{"c3", "hk", "dk", "ck", "h2", "ha", "ht"});
+        assertEquals(0, cardsA9.compareTo(cardsB9));
 
     }
 
@@ -79,7 +104,7 @@ public class CardsTest {
     }
 
     @Test
-    public void isNone(){
+    public void isNone() {
         String[] cards1 = {"s3", "st", "d4", "d5", "d6"};
         boolean actual1 = Cards.isNone(cards1);
         assertEquals(true, actual1);
@@ -104,7 +129,7 @@ public class CardsTest {
         boolean actual5 = Cards.isNone(cards5);
         assertEquals(false, actual5);
 
-        String[] cards6 = {"c6", "d6", "s6", "c7"};
+        String[] cards6 = {"c6", "d6", "s6", "c7", "s9"};
         boolean actual6 = Cards.isNone(cards6);
         assertEquals(false, actual6);
 
@@ -245,7 +270,7 @@ public class CardsTest {
         assertEquals(true, actual5);
         assertEquals(Cards.Combination.ThreeOfAKind, Cards.evaluate(cards5));
 
-        String[] cards6 = {"c6", "d6", "s6", "c7"};
+        String[] cards6 = {"c6", "d6", "s6", "c7", "s9"};
         boolean actual6 = Cards.isThreeOfAKind(cards6);
         assertEquals(true, actual6);
         assertEquals(Cards.Combination.ThreeOfAKind, Cards.evaluate(cards6));

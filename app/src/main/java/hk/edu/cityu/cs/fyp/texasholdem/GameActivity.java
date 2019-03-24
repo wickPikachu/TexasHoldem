@@ -144,6 +144,9 @@ public class GameActivity extends AppCompatActivity {
             ArrayList<String> computerCardList = texasHoldem.getComputerCardList();
             computerCardImage1.setImageResource(Utils.getDrawableResByString(this, computerCardList.get(0)));
             computerCardImage2.setImageResource(Utils.getDrawableResByString(this, computerCardList.get(1)));
+            foldButton.setEnabled(false);
+            callButton.setEnabled(false);
+            raiseButton.setEnabled(false);
         } else {
             computerCardImage1.setImageResource(R.drawable.gray_back);
             computerCardImage2.setImageResource(R.drawable.gray_back);
@@ -163,6 +166,9 @@ public class GameActivity extends AppCompatActivity {
         messageView.setText(texasHoldem.getMessage());
 
         ArrayList<String> tableCardList = texasHoldem.getTableCardList();
+        for (int i = 4; i >= tableCardList.size(); i--) {
+            tableCards.get(i).setImageResource(R.drawable.gray_back);
+        }
         for (int i = 0; i < tableCardList.size(); i++) {
             tableCards.get(i).setImageResource(Utils.getDrawableResByString(this, tableCardList.get(i)));
         }
@@ -248,6 +254,7 @@ public class GameActivity extends AppCompatActivity {
         switch (button.getId()) {
             case R.id.add2:
                 raiseBets += 200;
+                break;
             case R.id.add1:
                 raiseBets += 100;
                 break;
@@ -265,8 +272,8 @@ public class GameActivity extends AppCompatActivity {
             raiseBets = 0;
         }
 
+        raiseValueSeekBar.setProgress((int) ((double) raiseBets / texasHoldem.getPlayerMoney() * 100));
         raiseBetsEditText.setText("" + raiseBets);
-        raiseValueSeekBar.setProgress(raiseBets / texasHoldem.getPlayerMoney());
     }
 
 }
