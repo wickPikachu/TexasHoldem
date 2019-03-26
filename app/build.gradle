@@ -12,11 +12,11 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField "String", "SERVER_URL", '"http://127.0.0.1"'
+            buildConfigField "String", "SERVER_URL", '"192.168.1.100"'
             buildConfigField "Integer", "SERVER_PORT", '8808'
         }
         release {
-            buildConfigField "String", "SERVER_URL", '"http://127.0.0.1"'
+            buildConfigField "String", "SERVER_URL", '"127.0.0.1"'
             buildConfigField "Integer", "SERVER_PORT", '8808'
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

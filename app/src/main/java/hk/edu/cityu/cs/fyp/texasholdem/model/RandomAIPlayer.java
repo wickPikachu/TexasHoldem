@@ -25,7 +25,7 @@ public class RandomAIPlayer extends AIPlayer {
         int playerBets = texasHoldem.getPlayerBets();
 
         // determine fold or not
-        if (Utils.isPossibleOf(playerBets, playerMoney * 5, random)) {
+        if (Utils.isPossibleOf(playerBets, playerMoney * 10, random)) {
             texasHoldem.computerFold();
             return;
         }

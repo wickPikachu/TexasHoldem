@@ -46,11 +46,10 @@ public class TexasHoldem {
         ComputerRaised,
         BothCalled,
         Ended,
+        GameFinished,
     }
 
     private GameState gameState;
-
-    private int totalBets;
 
     private int playerMoney;
     private int playerBets;
@@ -84,7 +83,6 @@ public class TexasHoldem {
 
         rounds = 0;
         turn = 0;
-        totalBets = 0;
         playerMoney = 20000;
         playerBets = 0;
         computerMoney = 20000;
@@ -95,6 +93,8 @@ public class TexasHoldem {
      * Round Start
      */
     public void startRound() {
+        computerBets = 0;
+        playerBets = 0;
         playerCardList.clear();
         computerCardList.clear();
         tableCardList.clear();
@@ -104,12 +104,21 @@ public class TexasHoldem {
         isPlayerBuildBets = !isPlayerBuildBets;
         message = "Round " + rounds + " start";
 
+        // Game finish if cannot play next round
         // TODO: change who action first
         if (isPlayerBuildBets) {
+            if (playerMoney < BIG_BLIND_BET || computerMoney < BIG_BLIND_BET / 2) {
+                gameState = GameState.GameFinished;
+                return;
+            }
             playerBets = BIG_BLIND_BET;
             gameState = GameState.ComputerTurn;
             computerBets = BIG_BLIND_BET / 2;
         } else {
+            if (playerMoney < BIG_BLIND_BET / 2 || computerMoney < BIG_BLIND_BET) {
+                gameState = GameState.GameFinished;
+                return;
+            }
             playerBets = BIG_BLIND_BET / 2;
             gameState = GameState.PlayerTurn;
             computerBets = BIG_BLIND_BET;
@@ -169,9 +178,8 @@ public class TexasHoldem {
     }
 
     public void playerFold() {
-        message = "You folded";
         actionHistory += "f";
-        computerMoney += totalBets;
+        computerWin("You folded");
         endRound();
     }
 
@@ -203,9 +211,8 @@ public class TexasHoldem {
     }
 
     public void computerFold() {
-        message = "Computer folded";
         actionHistory += "f";
-        playerMoney += totalBets;
+        playerWin("Computer folded");
         endRound();
     }
 
@@ -240,18 +247,19 @@ public class TexasHoldem {
         aiPlayer.takeAction(this);
     }
 
-    private void playerWin() {
-        message = "Player Win!";
-        playerMoney += totalBets;
+    private void playerWin(String reason) {
+        message = "You Win! (" + reason + ")";
+        playerMoney += getTotalBets();
     }
 
-    private void playerLose() {
-        message = "Computer Win!";
-        computerMoney += totalBets;
+    private void computerWin(String reason) {
+        message = "You Lose! (Computer " + reason + ")";
+        computerMoney += getTotalBets();
     }
 
-    private void playerDraw() {
-        message = "Draw!";
+    private void playerDraw(String reason) {
+        message = "Draw! (" + reason + ")";
+        int totalBets = getTotalBets();
         playerMoney += totalBets / 2;
         computerMoney += totalBets / 2;
     }
@@ -260,15 +268,11 @@ public class TexasHoldem {
         Cards playerCards = new Cards(getPlayerCardsWithTable());
         Cards computerCards = new Cards(getComputerCardsWithTable());
         if (playerCards.compareTo(computerCards) > 0) {
-            message = "Player Win! (" + playerCards.getCombination().name() + ")";
-            playerMoney += totalBets;
+            playerWin(playerCards.getCombination().name());
         } else if (playerCards.compareTo(computerCards) < 0) {
-            message = "Computer Win! (" + computerCards.getCombination().name() + ")";
-            computerMoney += totalBets;
+            computerWin(computerCards.getCombination().name());
         } else {
-            message = "Draw! (" + playerCards.getCombination().name() + ")";
-            playerMoney += totalBets / 2;
-            computerMoney += totalBets / 2;
+            playerDraw(playerCards.getCombination().name());
         }
         endRound();
     }
@@ -303,6 +307,10 @@ public class TexasHoldem {
         return gameState == GameState.Ended;
     }
 
+    public boolean isGameFinished() {
+        return gameState == GameState.GameFinished;
+    }
+
     // Getters
 
     public GameState getGameState() {
@@ -318,7 +326,7 @@ public class TexasHoldem {
     }
 
     public int getTotalBets() {
-        return totalBets;
+        return playerBets + computerBets;
     }
 
     public int getPlayerMoney() {

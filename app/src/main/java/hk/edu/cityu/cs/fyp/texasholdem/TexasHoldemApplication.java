@@ -8,6 +8,7 @@ import hk.edu.cityu.cs.fyp.texasholdem.db.TexasHoldemDataBase;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.NetworkHelper;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.SharedPreferencesHelper;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.SocketHelper;
 
 public class TexasHoldemApplication extends Application {
 
@@ -18,6 +19,7 @@ public class TexasHoldemApplication extends Application {
         super.onCreate();
 
         NetworkHelper.getInstance().init(this);
+        SocketHelper.getInstance().init(this);
 
         db = Room.databaseBuilder(getApplicationContext(),
                 TexasHoldemDataBase.class, "database-name").build();

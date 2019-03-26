@@ -131,6 +131,10 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
+        if (texasHoldem.isGameFinished()) {
+            // TODO: cannot play and show message
+        }
+
         // AIPlayer turn
         if (texasHoldem.isComputerTurn()) {
             texasHoldem.takeAction(aiPlayer);
