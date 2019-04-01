@@ -12,6 +12,9 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.List;
+
+import hk.edu.cityu.cs.fyp.texasholdem.db.GameLog;
 
 public class SocketHelper {
 
@@ -95,6 +98,24 @@ public class SocketHelper {
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.e(TAG, "sent: " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void uploadGameLog(List<GameLog> gameLogs) {
+        handler.post(() -> {
+            try {
+                for (GameLog gameLog : gameLogs) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("acton", 1);
+                    jsonObject.put("data", gameLog.getResult());
+                    jsonObject.put("type", gameLog.getAiPlayer());
+                    bufferedWriter.write(jsonObject + "\n");
+                }
+                bufferedWriter.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.d(TAG, "uploadGameLog: " + e.getLocalizedMessage());
             }
         });
     }

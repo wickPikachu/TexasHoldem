@@ -25,5 +25,12 @@
     <string name="ai_player_random">Random AI Player</string>
     <string name="ai_player_minimax">Minimax AI Player</string>
     <string name="ai_player_machine_learning">Machine Learning AI Player</string>
+    <string name="log_detail">Log Detail</string>
+    <string name="sync">Synchronize</string>
+    <string-array name="ai_player_array">
+        <item>@string/ai_player_random</item>
+        <item>@string/ai_player_minimax</item>
+        <item>@string/ai_player_machine_learning</item>
+    </string-array>
 
 </resources>

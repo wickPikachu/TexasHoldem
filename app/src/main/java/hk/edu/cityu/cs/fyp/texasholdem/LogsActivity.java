@@ -1,35 +1,51 @@
 package hk.edu.cityu.cs.fyp.texasholdem;
 
-import android.arch.lifecycle.Observer;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import hk.edu.cityu.cs.fyp.texasholdem.db.GameLog;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.SharedPreferencesHelper;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.SocketHelper;
 import hk.edu.cityu.cs.fyp.texasholdem.viewmodel.LogsViewModel;
 
 public class LogsActivity extends AppCompatActivity {
 
     public static final String TAG = "LogsActivity";
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
+    @BindView(R.id.spinner)
+    Spinner spinner;
+
+    @BindView(R.id.log_detail)
+    TextView logDetail;
+
+    @BindView(R.id.sync_button)
+    Button syncButton;
 
     LogsViewModel logsViewModel;
-    List<GameLog> allGameLogs;
-    LogsAdapter logsAdapter;
+    List<GameLog> unsyncGameLogs;
+    AIPlayerNameAdapter aiPlayerNameAdapter;
+    int aiPlayerValue;
+    int hands = 0;
+    double bb100 = 0;
+    double totalMoney = 0;
+    int syncNum = 0;
+    SocketHelper socketHelper = SocketHelper.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,65 +53,141 @@ public class LogsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_logs);
         ButterKnife.bind(this);
 
-        logsAdapter = new LogsAdapter();
-        // use a linear layout manager
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(logsAdapter);
+        String[] aiPlayerNames = getResources().getStringArray(R.array.ai_player_array);
+        aiPlayerNameAdapter = new AIPlayerNameAdapter(aiPlayerNames);
+        spinner.setAdapter(aiPlayerNameAdapter);
+
+        aiPlayerValue = SharedPreferencesHelper.getAIPlayer(this).getConstantValue();
+        spinner.setSelection(aiPlayerValue - 1);
+        spinner.setOnItemSelectedListener(onItemSelectedListener);
 
         logsViewModel = ViewModelProviders.of(this).get(LogsViewModel.class);
-        logsViewModel.getAllGameLogsLive().observe(this, new Observer<List<GameLog>>() {
-            @Override
-            public void onChanged(@Nullable List<GameLog> gameLogs) {
-                if (allGameLogs == null) {
-                    allGameLogs = gameLogs;
-                    logsAdapter.notifyDataSetChanged();
-                }
+        logsViewModel.init(aiPlayerValue);
+
+        logsViewModel.getUnsyncGameLogsLive().observe(this, gameLogs -> {
+            unsyncGameLogs = gameLogs;
+            updateUI();
+        });
+
+        logsViewModel.getCountAllGameLogsLive().observe(this, count -> {
+            if (count != null) {
+                hands = count;
+            } else {
+                this.hands = 0;
             }
+            updateUI();
+        });
+
+        logsViewModel.getCountSyncGameLogsLive().observe(this, count -> {
+            if (count != null) {
+                this.syncNum = count;
+            } else {
+                this.syncNum = 0;
+            }
+            updateUI();
+        });
+
+        logsViewModel.getSumbbLive().observe(this, bb -> {
+            if (bb != null) {
+                bb100 = bb;
+            } else {
+                this.bb100 = 0;
+            }
+            updateUI();
+        });
+
+        logsViewModel.getTotalMoneyLive().observe(this, totalMoney -> {
+            if (totalMoney != null) {
+                this.totalMoney = totalMoney;
+            } else {
+                this.totalMoney = 0;
+            }
+            updateUI();
         });
     }
 
-    class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.ViewHolder> {
-
-        @NonNull
+    Spinner.OnItemSelectedListener onItemSelectedListener = new Spinner.OnItemSelectedListener() {
         @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_log, parent, false);
-            return new ViewHolder(view);
+        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+            logsViewModel.setAiPlayerValue(i + 1);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-            viewHolder.result.setText(allGameLogs.get(i).getResult());
+        public void onNothingSelected(AdapterView<?> adapterView) {
+            // nothing to do
+        }
+    };
+
+    @SuppressLint("DefaultLocale")
+    public void updateUI() {
+        if (unsyncGameLogs != null)
+            Log.d(TAG, "updateUI: numberOfGameLogs: " + unsyncGameLogs.size());
+        int unsyncNum = hands - syncNum;
+        logDetail.setText(String.format("Hands: %d\n" +
+                        "Win rate (bb/100): %.1f\n" +
+                        "Total win money: %.0f\n" +
+                        "Synchronized: %d\n" +
+                        "Un-synchronized: %d\n"
+                , hands, bb100, totalMoney, syncNum, unsyncNum));
+        syncButton.setEnabled(unsyncNum > 0);
+    }
+
+    @OnClick(R.id.sync_button)
+    public void onSyncButtonClicked() {
+        socketHelper.uploadGameLog(unsyncGameLogs);
+        // TODO: call back set isSync = true if success
+    }
+
+    class AIPlayerNameAdapter extends BaseAdapter {
+
+        String[] names;
+
+        AIPlayerNameAdapter(String[] names) {
+            this.names = names;
         }
 
         @Override
-        public int getItemCount() {
-            if (allGameLogs == null) {
+        public int getCount() {
+            if (names == null)
                 return 0;
-            }
-            return allGameLogs.size();
+            return names.length;
         }
 
-        class ViewHolder extends RecyclerView.ViewHolder {
+        @Override
+        public String getItem(int i) {
+            return names[i];
+        }
 
-            @BindView(R.id.result)
-            TextView result;
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
 
-            public ViewHolder(@NonNull View itemView) {
-                super(itemView);
-                ButterKnife.bind(this, itemView);
-                itemView.setOnClickListener(onClickListener);
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            ViewHolder viewHolder;
+            if (view == null) {
+                view = LayoutInflater.from(LogsActivity.this).inflate(R.layout.spinner_log_item, null);
+                viewHolder = new ViewHolder(view);
+                view.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) view.getTag();
             }
+            viewHolder.name.setText(names[i]);
 
-            View.OnClickListener onClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                }
-            };
+            return view;
+        }
+
+        class ViewHolder {
+
+            @BindView(R.id.name)
+            TextView name;
+
+            ViewHolder(View v) {
+                ButterKnife.bind(this, v);
+            }
         }
 
     }
-
 
 }

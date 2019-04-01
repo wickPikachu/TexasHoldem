@@ -19,6 +19,18 @@ public class GameLog {
     @ColumnInfo(name = "is_sync")
     private boolean isSync;
 
+    @ColumnInfo(name = "ai_player")
+    private int aiPlayer;
+
+    /**
+     * for calculate bb/100
+     */
+    @ColumnInfo(name = "bb")
+    private double bb;
+
+    @ColumnInfo(name = "money")
+    private double money;
+
     @TypeConverters({DateConverter.class})
     @ColumnInfo(name = "created_at")
     private Date createdAt;
@@ -51,8 +63,32 @@ public class GameLog {
         return isSync;
     }
 
+    public double getMoney() {
+        return money;
+    }
+
+    public void setMoney(double money) {
+        this.money = money;
+    }
+
     public void setSync(boolean sync) {
         isSync = sync;
+    }
+
+    public int getAiPlayer() {
+        return aiPlayer;
+    }
+
+    public void setAiPlayer(int aiPlayer) {
+        this.aiPlayer = aiPlayer;
+    }
+
+    public double getBb() {
+        return bb;
+    }
+
+    public void setBb(double bb) {
+        this.bb = bb;
     }
 
     public void setCreatedAt(Date createdAt) {

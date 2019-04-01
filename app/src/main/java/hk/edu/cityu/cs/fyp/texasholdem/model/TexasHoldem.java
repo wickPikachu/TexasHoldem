@@ -26,6 +26,7 @@ public class TexasHoldem {
     private ArrayList<String> tableCardList = new ArrayList<>();
     private Stack<String> deck = new Stack<>();
 
+    private AIPlayer aiPlayer;
     // for save log to db
     private boolean isSaveLogs = true;
     private boolean isPlayerBuildBets;
@@ -36,8 +37,8 @@ public class TexasHoldem {
     // init = 0, start from 1
     private int turn;
     private String message;
-    private
 
+    private
     enum GameState {
         PlayerTurn,
         PlayerCalled,
@@ -74,7 +75,8 @@ public class TexasHoldem {
      * Game Start
      * init player, computer, and settings
      */
-    public void init() {
+    public void init(AIPlayer aiPlayer) {
+        this.aiPlayer = aiPlayer;
         isPlayerActionFirst = true;
         isPlayerBuildBets = true;
         actionHistory = "";
@@ -164,13 +166,16 @@ public class TexasHoldem {
         gameLogResults += rounds + ":" + actionHistory + "|" + cardHistory + "|" + betsResult + "\n";
 //        message = "This round winner is ";
         gameState = GameState.Ended;
+        String[] betsArray = betsResult.split("\\|");
 
         // insert to database
         if (isSaveLogs) {
             Thread t = new Thread() {
                 public void run() {
                     GameLog gameLog = new GameLog();
-                    gameLog.setResult(actionHistory);
+                    gameLog.setResult(gameLogResults);
+                    gameLog.setAiPlayer(aiPlayer.getConstantValue());
+                    gameLog.setMoney(Double.valueOf(betsArray[0]));
                     TexasHoldemApplication.db.getResultDao().insert(gameLog);
                 }
             };
@@ -220,7 +225,7 @@ public class TexasHoldem {
         message = "You raised $" + raiseBets;
         playerMoney -= raiseBets;
         playerBets += raiseBets;
-        actionHistory += "b" + raiseBets;
+        actionHistory += "r" + raiseBets;
         gameState = GameState.PlayerRaised;
     }
 
@@ -252,7 +257,7 @@ public class TexasHoldem {
         }
         computerMoney -= raiseBets;
         computerBets += raiseBets;
-        actionHistory += "b" + raiseBets;
+        actionHistory += "r" + raiseBets;
         message = "Computer raised $" + raiseBets;
         gameState = GameState.ComputerRaised;
     }
@@ -263,12 +268,16 @@ public class TexasHoldem {
 
     private void playerWin(String reason) {
         message = "You Win! (" + reason + ")";
-        playerMoney += getTotalBets();
+        int totalBets = getTotalBets();
+        playerMoney += totalBets;
+        betsResult = totalBets + "|" + (-totalBets);
     }
 
     private void computerWin(String reason) {
         message = "You Lose! (Computer " + reason + ")";
+        int totalBets = getTotalBets();
         computerMoney += getTotalBets();
+        betsResult = (-totalBets) + "|" + totalBets;
     }
 
     private void playerDraw(String reason) {
@@ -276,6 +285,7 @@ public class TexasHoldem {
         int totalBets = getTotalBets();
         playerMoney += totalBets / 2;
         computerMoney += totalBets / 2;
+        betsResult = "0|0";
     }
 
     public void determineWinner() {

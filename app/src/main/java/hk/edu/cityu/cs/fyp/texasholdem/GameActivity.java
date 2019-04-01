@@ -102,6 +102,7 @@ public class GameActivity extends AppCompatActivity {
 
         // from shared preference get AI player level
         aiPlayer = SharedPreferencesHelper.getAIPlayer(this);
+
         computerNameText.setText(aiPlayer.getName() + ":");
         if (aiPlayer.getName().length() > RandomAIPlayer.NAME.length()) {
             computerMoneyText.setTextSize(18);
@@ -111,19 +112,15 @@ public class GameActivity extends AppCompatActivity {
 
         // TODO: view texasHoldem to control DB
         gameViewModel = ViewModelProviders.of(this).get(GameViewModel.class);
-        gameViewModel.getUnsyncResult().observe(this, new Observer<List<GameLog>>() {
-            @Override
-            public void onChanged(@Nullable List<GameLog> gameLogs) {
-                if (unSyncGameLogs == null)
-                    unSyncGameLogs = gameLogs;
-            }
+        gameViewModel.getUnsyncResult().observe(this, gameLogs -> {
+            unSyncGameLogs = gameLogs;
         });
 
         // default $200 in raise editText
         raiseBetsEditText.setText("200");
 
         texasHoldem = TexasHoldem.getInstance();
-        texasHoldem.init();
+        texasHoldem.init(aiPlayer);
 
         raiseValueSeekBar.setOnSeekBarChangeListener(onRaiseValueSeekBarChangeListener);
         texasHoldem.startRound();
