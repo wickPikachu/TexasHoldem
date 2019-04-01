@@ -18,5 +18,12 @@
     <string name="logs">Logs</string>
     <string name="setting_activity">Setting</string>
     <string name="logs_activity">Logs</string>
+    <string name="auto_sync_setting_activity">Auto Sync Setting</string>
+    <string name="aiplayer_setting_activity">AIPlayer Setting</string>
+    <string name="ai_player_setting">AI Player</string>
+    <string name="auto_sync_setting">Auto Sync</string>
+    <string name="ai_player_random">Random AI Player</string>
+    <string name="ai_player_minimax">Minimax AI Player</string>
+    <string name="ai_player_machine_learning">Machine Learning AI Player</string>
 
 </resources>

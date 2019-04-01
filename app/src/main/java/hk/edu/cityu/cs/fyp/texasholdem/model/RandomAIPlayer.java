@@ -3,6 +3,7 @@ package hk.edu.cityu.cs.fyp.texasholdem.model;
 import java.util.Random;
 
 import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 
 public class RandomAIPlayer extends AIPlayer {
@@ -47,5 +48,10 @@ public class RandomAIPlayer extends AIPlayer {
     @Override
     public String getName() {
         return NAME;
+    }
+
+    @Override
+    public int getConstantValue() {
+        return Constants.AI_PLAYER_RANDOM;
     }
 }

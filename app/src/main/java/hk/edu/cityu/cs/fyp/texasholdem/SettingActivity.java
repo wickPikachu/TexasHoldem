@@ -1,33 +1,40 @@
 package hk.edu.cityu.cs.fyp.texasholdem;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Switch;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.SharedPreferencesHelper;
-import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
-import hk.edu.cityu.cs.fyp.texasholdem.model.MachineLearningAIPlayer;
-import hk.edu.cityu.cs.fyp.texasholdem.model.MiniMaxAIPlayer;
-import hk.edu.cityu.cs.fyp.texasholdem.model.RandomAIPlayer;
 
 public class SettingActivity extends AppCompatActivity {
 
     public static final String TAG = "SettingActivity";
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
+    @BindView(R.id.ai_player_random_tick)
+    ImageView aiPlayerRandomTickImage;
 
-    private SettingAdapter settingAdapter;
-    private RecyclerView.LayoutManager layoutManager;
+    @BindView(R.id.ai_player_minimax_tick)
+    ImageView aiPlayerMinimaxTickImage;
+
+    @BindView(R.id.ai_player_ml_tick)
+    ImageView aiPlayerMLTickImage;
+
+    @BindView(R.id.ai_player_random_auto_sync_switch)
+    Switch aiPlayerRandomAutoSyncSwitch;
+
+    @BindView(R.id.ai_player_minimax_auto_sync_switch)
+    Switch aiPlayerMinimaxAutoSyncSwitch;
+
+    @BindView(R.id.ai_player_ml_auto_sync_switch)
+    Switch aiPlayerMLAutoSyncSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,85 +42,54 @@ public class SettingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
 
-        recyclerView.setHasFixedSize(true);
+        aiPlayerRandomAutoSyncSwitch.setTag(Constants.AI_PLAYER_RANDOM);
+        aiPlayerMinimaxAutoSyncSwitch.setTag(Constants.AI_PLAYER_MINIMAX);
+        aiPlayerMLAutoSyncSwitch.setTag(Constants.AI_PLAYER_MACHINE_LEARNING);
 
-        // use a linear layout manager
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
-
-        String[] playersName = {
-                RandomAIPlayer.NAME,
-                MiniMaxAIPlayer.NAME,
-                MachineLearningAIPlayer.NAME,
-        };
-
-        // specify an adapter (see also next example)
-        settingAdapter = new SettingAdapter(playersName);
-        recyclerView.setAdapter(settingAdapter);
+        updateUI();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        settingAdapter.notifyDataSetChanged();
+    public void updateUI() {
+        int aiPlayerValue = SharedPreferencesHelper.getAIPlayer(this).getConstantValue();
+        aiPlayerRandomTickImage.setVisibility(aiPlayerValue == Constants.AI_PLAYER_RANDOM ? View.VISIBLE : View.GONE);
+        aiPlayerMinimaxTickImage.setVisibility(aiPlayerValue == Constants.AI_PLAYER_MINIMAX ? View.VISIBLE : View.GONE);
+        aiPlayerMLTickImage.setVisibility(aiPlayerValue == Constants.AI_PLAYER_MACHINE_LEARNING ? View.VISIBLE : View.GONE);
+
+        aiPlayerRandomAutoSyncSwitch.setChecked(SharedPreferencesHelper.getIsAIPlayerAutoSync(this, Constants.AI_PLAYER_RANDOM));
+        aiPlayerMinimaxAutoSyncSwitch.setChecked(SharedPreferencesHelper.getIsAIPlayerAutoSync(this, Constants.AI_PLAYER_MINIMAX));
+        aiPlayerMLAutoSyncSwitch.setChecked(SharedPreferencesHelper.getIsAIPlayerAutoSync(this, Constants.AI_PLAYER_MACHINE_LEARNING));
     }
 
-    class SettingAdapter extends RecyclerView.Adapter<SettingAdapter.ViewHolder> {
-
-        private String[] names;
-
-        public SettingAdapter(String[] names) {
-            this.names = names;
+    @OnClick({
+            R.id.ai_player_random,
+            R.id.ai_player_minimax,
+            R.id.ai_player_ml,
+    })
+    public void onAIPlayerLayoutClicked(ConstraintLayout layout) {
+        int aiPlayerValue;
+        switch (layout.getId()) {
+            default:
+            case R.id.ai_player_random:
+                aiPlayerValue = Constants.AI_PLAYER_RANDOM;
+                break;
+            case R.id.ai_player_minimax:
+                aiPlayerValue = Constants.AI_PLAYER_MINIMAX;
+                break;
+            case R.id.ai_player_ml:
+                aiPlayerValue = Constants.AI_PLAYER_MACHINE_LEARNING;
+                break;
         }
-
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_setting, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-            String name = names[i];
-            viewHolder.name.setText(name);
-            if (name.equals(SharedPreferencesHelper.getAIPlayer(SettingActivity.this).getName())) {
-                viewHolder.tickImage.setVisibility(View.VISIBLE);
-            } else {
-                viewHolder.tickImage.setVisibility(View.INVISIBLE);
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return 3;
-        }
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-
-            @BindView(R.id.name)
-            TextView name;
-
-            @BindView(R.id.tick)
-            ImageView tickImage;
-
-            public ViewHolder(@NonNull View itemView) {
-                super(itemView);
-                ButterKnife.bind(this, itemView);
-                itemView.setOnClickListener(onClickListener);
-            }
-
-            View.OnClickListener onClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int aiPlayerValue = Utils.getAIPlayerValue(name.getText().toString());
-                    SharedPreferencesHelper.setAIPlayer(SettingActivity.this, aiPlayerValue);
-                    settingAdapter.notifyDataSetChanged();
-                }
-            };
-        }
-
+        SharedPreferencesHelper.setAIPlayer(this, aiPlayerValue);
+        updateUI();
     }
 
+    @OnCheckedChanged({
+            R.id.ai_player_random_auto_sync_switch,
+            R.id.ai_player_minimax_auto_sync_switch,
+            R.id.ai_player_ml_auto_sync_switch,
+    })
+    public void onAutoSyncSwitchChecked(Switch autoSyncSwitch, boolean isAutoSync) {
+        int aiPlayerValue = Integer.valueOf(autoSyncSwitch.getTag().toString());
+        SharedPreferencesHelper.setAIPlayerAutoSync(this, aiPlayerValue, isAutoSync);
+    }
 }

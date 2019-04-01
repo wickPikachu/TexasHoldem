@@ -36,6 +36,7 @@ public class TexasHoldem {
     // init = 0, start from 1
     private int turn;
     private String message;
+    private
 
     enum GameState {
         PlayerTurn,
@@ -108,7 +109,7 @@ public class TexasHoldem {
         // TODO: change who action first
         if (isPlayerBuildBets) {
             if (playerMoney < BIG_BLIND_BET || computerMoney < BIG_BLIND_BET / 2) {
-                gameState = GameState.GameFinished;
+                gameFinished();
                 return;
             }
             playerBets = BIG_BLIND_BET;
@@ -116,7 +117,7 @@ public class TexasHoldem {
             computerBets = BIG_BLIND_BET / 2;
         } else {
             if (playerMoney < BIG_BLIND_BET / 2 || computerMoney < BIG_BLIND_BET) {
-                gameState = GameState.GameFinished;
+                gameFinished();
                 return;
             }
             playerBets = BIG_BLIND_BET / 2;
@@ -175,6 +176,19 @@ public class TexasHoldem {
             };
             t.start();
         }
+    }
+
+    public void gameFinished() {
+        gameState = GameState.GameFinished;
+        String result = "";
+        if (playerMoney == computerMoney) {
+            result = "Draw";
+        } else if (playerMoney > computerMoney) {
+            result = "You are winner";
+        } else {
+            result = "Computer is winner";
+        }
+        message = String.format("Game finished!\n (%s)", result);
     }
 
     public void playerFold() {

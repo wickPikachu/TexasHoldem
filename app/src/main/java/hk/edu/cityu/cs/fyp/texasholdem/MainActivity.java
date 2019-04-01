@@ -12,17 +12,10 @@ import android.widget.LinearLayout;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.SocketHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,14 +24,8 @@ public class MainActivity extends AppCompatActivity {
     Button logsButton;
 
     public static final String TAG = "MainActivity";
-    SocketHelper socketHelper;
-    private Socket socket;
-    private BufferedWriter bufferedWriter;
-    private BufferedReader bufferedReader;
-    OutputStreamWriter outputStreamWriter;
-    private SocketHelper.SocketListener socketListener;
+    SocketHelper socketHelper = SocketHelper.getInstance();
     JSONObject jsonObject;
-    String response = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 //        logsButton.setVisibility(View.GONE);
 
-        JSONObject jsonObject = new JSONObject();
+        jsonObject = new JSONObject();
         try {
             jsonObject.put("test", "test message");
         } catch (JSONException e) {
@@ -55,62 +42,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // test network
-        Thread thread = new Thread(Connection);
-        thread.start();
-
-    }
-
-    private Runnable Connection = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                socket = new Socket(BuildConfig.SERVER_URL, BuildConfig.SERVER_PORT);
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(
-                        1024);
-                byte[] buffer = new byte[1024];
-
-                int bytesRead;
-                InputStream inputStream = socket.getInputStream();
-
-                /*
-                 * notice: inputStream.read() will block if no data return
-                 */
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    byteArrayOutputStream.write(buffer, 0, bytesRead);
-                    response += byteArrayOutputStream.toString("UTF-8");
-                }
-
-                bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                while (socket.isConnected()) {
-                    String tmp = bufferedReader.readLine();
-                    if (tmp != null) {
-                        tmp = tmp.substring(tmp.indexOf("{"), tmp.lastIndexOf("}") + 1);
-                        JSONObject message = new JSONObject(tmp);
-                    }
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.d(TAG, "connectToServer: " + e.getLocalizedMessage());
+        socketHelper.connectToServer(BuildConfig.SERVER_URL, BuildConfig.SERVER_PORT, new SocketHelper.SocketListener() {
+            @Override
+            public void onResponse(JSONObject message) {
+                Log.d(TAG, "onResponse: " + message.toString());
             }
 
-        }
-    };
-
-    public void sent(JSONObject jsonObject) {
-        try {
-            outputStreamWriter.write(jsonObject + "\n");
-            outputStreamWriter.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d(TAG, "sent: " + e.getLocalizedMessage());
-        }
+            @Override
+            public void onError(String errorMsg) {
+                Log.e(TAG, "onError: " + errorMsg);
+            }
+        });
+        socketHelper.sent(jsonObject);
     }
-
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        socketHelper.disconnect();
     }
 
     @OnClick(R.id.play)
@@ -135,11 +84,12 @@ public class MainActivity extends AppCompatActivity {
     public void onHelpClicked() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Help");
+        builder.setMessage(Constants.HELP_MESSAGE_RULE);
         View v = LinearLayout.inflate(this, R.layout.alert_help, null);
         builder.setView(v);
         builder.show();
 
-        sent(jsonObject);
+        socketHelper.sent(jsonObject);
     }
 
 }

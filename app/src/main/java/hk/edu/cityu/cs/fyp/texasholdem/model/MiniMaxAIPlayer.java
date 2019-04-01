@@ -1,7 +1,12 @@
 package hk.edu.cityu.cs.fyp.texasholdem.model;
 
+import java.util.HashMap;
+
+import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
+
 public class MiniMaxAIPlayer extends AIPlayer {
 
+    public static final String TAG = "MiniMaxAIPlayer";
     public static final String NAME = "MiniMax AIPlayer";
 
     double Pr2 = 4;
@@ -18,13 +23,73 @@ public class MiniMaxAIPlayer extends AIPlayer {
     double PrK = 4;
     double PrA = 4;
 
+    private long originalCards = 0xFFFFFFFFFFFFFL;
+    private HashMap<Cards.Combination, Double> probMap = new HashMap<>();
+    private long cards = 0L;
+
+    private int getNumberOfcards(long cards) {
+        int num = 0;
+        for (int i = 0; i < 52; i++) {
+            if ((cards & 1L) == 1L) {
+                num++;
+            }
+        }
+        switch (num) {
+            case 2:
+                return 1;
+            case 5:
+                return 2;
+            case 6:
+                return 3;
+            case 7:
+                return 4;
+        }
+        // wrong state, maybe bug
+        return -1;
+    }
+
+    private HashMap<Cards.Combination, Double> evalvateProbMap(long cards) {
+        long total;
+        total = 50 * 49 * 48 * 47 * 46;
+        HashMap<Cards.Combination, Double> probMap = new HashMap<>();
+        int numberOfCards = getNumberOfcards(cards);
+        if (numberOfCards == 2) {
+
+        } else if (numberOfCards == 5) {
+
+        } else if (numberOfCards == 6) {
+
+        } else if (numberOfCards == 7) {
+
+        } else {
+
+        }
+
+        probMap.put(Cards.Combination.None, 1.0);
+        probMap.put(Cards.Combination.Pair, 1.0);
+        probMap.put(Cards.Combination.TwoPairs, 1.0);
+        probMap.put(Cards.Combination.ThreeOfAKind, 1.0);
+        probMap.put(Cards.Combination.Straight, 1.0);
+        probMap.put(Cards.Combination.Flush, 1.0);
+        probMap.put(Cards.Combination.FullHouse, 1.0);
+        probMap.put(Cards.Combination.FourOfAKind, 1.0);
+        probMap.put(Cards.Combination.StraightFlush, 1.0);
+        probMap.put(Cards.Combination.RoyalFlush, 1.0);
+        return probMap;
+    }
+
+    public int getBestAction() {
+
+        return 0;
+    }
+
     // Returns optimal value for
     // current player (Initially called
     // for root and maximizer)
-    public static int minimax(int depth, int nodeIndex,
-                              Boolean maximizingPlayer,
-                              int values[], int alpha,
-                              int beta) {
+    public int minimax(int depth, int nodeIndex,
+                       Boolean maximizingPlayer,
+                       int values[], int alpha,
+                       int beta) {
         // Terminating condition. i.e
         // leaf node is reached
         if (depth == 3)
@@ -76,4 +141,8 @@ public class MiniMaxAIPlayer extends AIPlayer {
         return NAME;
     }
 
+    @Override
+    public int getConstantValue() {
+        return Constants.AI_PLAYER_MINIMAX;
+    }
 }
