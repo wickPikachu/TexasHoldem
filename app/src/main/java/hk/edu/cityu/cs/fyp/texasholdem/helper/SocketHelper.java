@@ -3,8 +3,10 @@ package hk.edu.cityu.cs.fyp.texasholdem.helper;
 import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -54,7 +56,7 @@ public class SocketHelper {
             this.socketListener = socketListener;
             handler.post(Connection);
         } else {
-            Log.d(TAG, "connectToServer: socket already connect to " + this.ipAddress + ":" + this.port);
+            Log.e(TAG, "connectToServer: socket already connect to " + this.ipAddress + ":" + this.port);
         }
     }
 
@@ -70,7 +72,7 @@ public class SocketHelper {
             } catch (Exception e) {
                 e.printStackTrace();
                 socketListener.onError(e.getLocalizedMessage());
-                Log.d(TAG, "connectToServer: " + e.getLocalizedMessage());
+                Log.e(TAG, "run: " + e.getLocalizedMessage());
             }
 
         }
@@ -81,19 +83,25 @@ public class SocketHelper {
             String msg;
             while (socket.isConnected() && (msg = bufferedReader.readLine()) != null) {
                 Log.d(TAG, "recvThread: msg: " + msg);
-                msg = msg.substring(msg.indexOf("{"), msg.lastIndexOf("}") + 1);
-                JSONObject message = new JSONObject(msg);
-                socketListener.onResponse(message);
+                if (msg.equals(""))
+                    continue;
+                try {
+                    JSONObject message = new JSONObject(msg);
+                    socketListener.onResponse(message);
+                } catch (JSONException je) {
+                    Log.e(TAG, "recvThread: JSONException: " + je.getLocalizedMessage());
+                }
             }
         } catch (Exception e) {
             Log.e(TAG, "recvThread: " + e.getLocalizedMessage());
+            disconnect();
         }
     });
 
     public void sent(JSONObject jsonObject) {
         handler.post(() -> {
             try {
-                bufferedWriter.write(jsonObject + "\n");
+                bufferedWriter.write(jsonObject.toString() + "\n");
                 bufferedWriter.flush();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -107,15 +115,17 @@ public class SocketHelper {
             try {
                 for (GameLog gameLog : gameLogs) {
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("acton", 1);
-                    jsonObject.put("data", gameLog.getResult());
-                    jsonObject.put("type", gameLog.getAiPlayer());
-                    bufferedWriter.write(jsonObject + "\n");
+                    jsonObject.put(Constants.Json.KEY_ACTION, 1);
+                    jsonObject.put(Constants.Json.KEY_DATA, gameLog.getResult());
+                    jsonObject.put(Constants.Json.KEY_TYPE, gameLog.getAiPlayer());
+                    jsonObject.put(Constants.Json.KEY_UUID, gameLog.getUuid());
+                    Log.d(TAG, "uploadGameLog: " + jsonObject.toString());
+                    bufferedWriter.write(jsonObject.toString() + "\n");
+                    bufferedWriter.flush();
                 }
-                bufferedWriter.flush();
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.d(TAG, "uploadGameLog: " + e.getLocalizedMessage());
+                Log.e(TAG, "uploadGameLog: " + e.getLocalizedMessage());
             }
         });
     }
@@ -128,13 +138,13 @@ public class SocketHelper {
                 socket.close();
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.d(TAG, "disconnect: " + e.getLocalizedMessage());
+                Log.e(TAG, "disconnect: " + e.getLocalizedMessage());
             }
         });
     }
 
     public interface SocketListener {
-        public void onResponse(JSONObject message);
+        public void onResponse(JSONObject jsonObject);
 
         public void onError(String errorMsg);
     }

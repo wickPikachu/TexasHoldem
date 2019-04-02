@@ -23,6 +23,7 @@ public class RandomAIPlayer extends AIPlayer {
     @Override
     public void takeAction(TexasHoldem texasHoldem) {
         int playerMoney = texasHoldem.getPlayerMoney();
+        int computerMoney = texasHoldem.getComputerMoney();
         int playerBets = texasHoldem.getPlayerBets();
 
         // determine fold or not
@@ -32,16 +33,21 @@ public class RandomAIPlayer extends AIPlayer {
         }
 
         // determine raise or not
-        if (Utils.isPossibleOf(2)) {
+        if (Utils.isPossibleOf(2) && Math.min(playerMoney, computerMoney) > 0) {
             try {
-                texasHoldem.computerRaise((random.nextInt(texasHoldem.getComputerMoney() / 100 - 1) + 1) * 100);
+                int raiseBet = random.nextInt(Math.min(playerMoney, computerMoney)) / 100 * 100;
+                if (raiseBet > 0) {
+                    texasHoldem.computerRaise(raiseBet);
+                } else {
+                    texasHoldem.computerCall();
+                }
+
             } catch (TexasHoldemException e) {
                 e.printStackTrace();
             }
         } else {
             // call
             texasHoldem.computerCall();
-
         }
     }
 

@@ -15,7 +15,7 @@ public class TexasHoldemTest {
     public void setUp() throws Exception {
         texasHoldem = TexasHoldem.getInstance();
         texasHoldem.setSaveLogs(false);
-        texasHoldem.init();
+        texasHoldem.init(new RandomAIPlayer());
     }
 
     @Test

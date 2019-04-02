@@ -10,9 +10,19 @@ public class Constants {
         String KEY_AI_PLAYER_MACHINE_LEARNING_AUTO_SYNC = "AI_Player_machine_learning_auto_sync";
     }
 
-    public static final int SOCKET_ACTION_UPLOAD = 1;
-    public static final int SOCKET_ACTION_PREDICT = 2;
-    public static final int SOCKET_ACTION_GET = 3;
+    public interface Socket {
+        int ACTION_SYNC = 1;
+        int ACTION_PREDICT = 2;
+        int ACTION_GET = 3;
+    }
+
+    public interface Json {
+        String KEY_ACTION = "action";
+        String KEY_UUID = "uuid";
+        String KEY_DATA = "data";
+        String KEY_TYPE = "type";
+        String KEY_SUCCESS = "success";
+    }
 
     public static final int AI_PLAYER_RANDOM = 1;
     public static final int AI_PLAYER_MINIMAX = 2;

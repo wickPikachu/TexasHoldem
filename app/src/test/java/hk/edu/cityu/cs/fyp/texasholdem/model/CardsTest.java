@@ -1,5 +1,7 @@
 package hk.edu.cityu.cs.fyp.texasholdem.model;
 
+import android.util.Log;
+
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -85,6 +87,76 @@ public class CardsTest {
         Cards cardsB9 = new Cards(new String[]{"c3", "hk", "dk", "ck", "h2", "ha", "ht"});
         assertEquals(0, cardsA9.compareTo(cardsB9));
 
+        ArrayList<CardsTestItem> testCardsList = new ArrayList<>();
+        // full house
+        testCardsList.add(new CardsTestItem(
+                new Cards(new String[]{"d4", "d3", "s4", "h3", "c4", "sa", "st"}),
+                new Cards(new String[]{"d4", "d5", "s4", "h5", "c4", "sa", "st"}),
+                -1
+        ));
+        testCardsList.add(new CardsTestItem(
+                new Cards(new String[]{"d7", "d3", "s7", "h3", "c7", "sa", "st"}),
+                new Cards(new String[]{"d4", "d5", "s4", "h5", "c4", "sa", "st"}),
+                1
+        ));
+        testCardsList.add(new CardsTestItem(
+                new Cards(new String[]{"d2", "d3", "s2", "h3", "c2", "sa", "st"}),
+                new Cards(new String[]{"h2", "d3", "s2", "h3", "c2", "sa", "st"}),
+                0
+        ));
+
+        // Straight
+        testCardsList.add(new CardsTestItem(
+                new Cards(new String[]{"d7", "d3", "da", "dj", "dk", "sa", "st"}),
+                new Cards(new String[]{"d7", "d3", "da", "dk", "dt", "sa", "st"}),
+                1
+        ));
+        testCardsList.add(new CardsTestItem(
+                new Cards(new String[]{"d7", "d3", "da", "dj", "dk", "sa", "st"}),
+                new Cards(new String[]{"s7", "s3", "sa", "sk", "sj", "d2", "s2"}),
+                0
+        ));
+
+        // StraightFlush
+        testCardsList.add(new CardsTestItem(
+                new Cards(new String[]{"s7", "d3", "d4", "d5", "d6", "d2", "d9"}),
+                new Cards(new String[]{"d2", "d3", "d5", "d4", "da", "sa", "d7"}),
+                1
+        ));
+        testCardsList.add(new CardsTestItem(
+                new Cards(new String[]{"s7", "d3", "d4", "d5", "d6", "d9", "d7"}),
+                new Cards(new String[]{"d2", "d3", "d5", "d4", "d6", "sa", "d7"}),
+                0
+        ));
+
+        // RoyalFlush
+        testCardsList.add(new CardsTestItem(
+                new Cards(new String[]{"d7", "sj", "sq", "sk", "dt", "sa", "st"}),
+                new Cards(new String[]{"d7", "d9", "dt", "dj", "dk", "dq", "st"}),
+                1
+        ));
+        testCardsList.add(new CardsTestItem(
+                new Cards(new String[]{"d7", "sj", "sq", "sk", "dt", "sa", "st"}),
+                new Cards(new String[]{"h8", "hj", "hq", "hk", "ht", "ha", "h9"}),
+                0
+        ));
+
+        for (CardsTestItem cardsTestItem : testCardsList) {
+            assertEquals(cardsTestItem.expected, cardsTestItem.cardsA.compareTo(cardsTestItem.cardsB));
+        }
+
+    }
+
+    class CardsTestItem {
+        Cards cardsA;
+        Cards cardsB;
+        int expected;
+
+        public CardsTestItem(Cards cardsA, Cards cardsB, int assertResult) {
+            this.cardsA = cardsA;
+            this.cardsB = cardsB;
+            this.expected = assertResult;
+        }
     }
 
     @Test

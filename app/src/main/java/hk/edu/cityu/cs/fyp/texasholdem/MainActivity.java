@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -40,20 +39,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        // test network
-        socketHelper.connectToServer(BuildConfig.SERVER_URL, BuildConfig.SERVER_PORT, new SocketHelper.SocketListener() {
-            @Override
-            public void onResponse(JSONObject message) {
-                Log.d(TAG, "onResponse: " + message.toString());
-            }
-
-            @Override
-            public void onError(String errorMsg) {
-                Log.e(TAG, "onError: " + errorMsg);
-            }
-        });
-        socketHelper.sent(jsonObject);
     }
 
     @Override
@@ -88,8 +73,6 @@ public class MainActivity extends AppCompatActivity {
         View v = LinearLayout.inflate(this, R.layout.alert_help, null);
         builder.setView(v);
         builder.show();
-
-        socketHelper.sent(jsonObject);
     }
 
 }

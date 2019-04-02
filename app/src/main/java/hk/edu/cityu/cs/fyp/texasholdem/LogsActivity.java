@@ -14,14 +14,21 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hk.edu.cityu.cs.fyp.texasholdem.db.GameLog;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.SharedPreferencesHelper;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.SocketHelper;
+import hk.edu.cityu.cs.fyp.texasholdem.model.TexasHoldem;
 import hk.edu.cityu.cs.fyp.texasholdem.viewmodel.LogsViewModel;
 
 public class LogsActivity extends AppCompatActivity {
@@ -134,8 +141,33 @@ public class LogsActivity extends AppCompatActivity {
 
     @OnClick(R.id.sync_button)
     public void onSyncButtonClicked() {
+        socketHelper.connectToServer("10.0.2.2", BuildConfig.SERVER_PORT, new SocketHelper.SocketListener() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                Log.d(TAG, "onResponse: " + jsonObject.toString());
+                if (jsonObject.has(Constants.Json.KEY_SUCCESS)) {
+                    try {
+                        JSONArray uuidArray = jsonObject.getJSONArray(Constants.Json.KEY_SUCCESS);
+                        int len = uuidArray.length();
+                        ArrayList<String> uuids = new ArrayList<>();
+                        for (int i = 0; i < len; i++) {
+                            uuids.add(uuidArray.getString(i));
+                        }
+                        TexasHoldemApplication.db.getResultDao().updateIsSync(uuids, true);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            @Override
+            public void onError(String errorMsg) {
+                Log.e(TAG, "onError: " + errorMsg);
+            }
+        });
+        // upload action
         socketHelper.uploadGameLog(unsyncGameLogs);
-        // TODO: call back set isSync = true if success
     }
 
     class AIPlayerNameAdapter extends BaseAdapter {

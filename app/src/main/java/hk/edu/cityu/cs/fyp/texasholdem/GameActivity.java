@@ -1,8 +1,7 @@
 package hk.edu.cityu.cs.fyp.texasholdem;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -86,8 +85,15 @@ public class GameActivity extends AppCompatActivity {
 
     @BindView(R.id.computer_card1)
     ImageView computerCardImage1;
+
     @BindView(R.id.computer_card2)
     ImageView computerCardImage2;
+
+    @BindView(R.id.overlay_layout)
+    ConstraintLayout overlayLayout;
+
+    @BindView(R.id.overlay_message)
+    TextView overlayMessageText;
 
     GameViewModel gameViewModel;
     TexasHoldem texasHoldem;
@@ -133,6 +139,9 @@ public class GameActivity extends AppCompatActivity {
             texasHoldem.takeAction(aiPlayer);
         }
 
+        overlayLayout.setVisibility(texasHoldem.isGameFinished() || texasHoldem.isEnded() ? View.VISIBLE : View.INVISIBLE);
+        overlayMessageText.setText(texasHoldem.getMessage());
+
         if (texasHoldem.isBothCalled()) {
             texasHoldem.next();
         }
@@ -158,8 +167,10 @@ public class GameActivity extends AppCompatActivity {
         computerBetsMoneyText.setText("Bet: $" + texasHoldem.getComputerBets());
 
         ArrayList<String> playerCards = texasHoldem.getPlayerCardList();
-        myHand1.setImageResource(Utils.getDrawableResByString(this, playerCards.get(0)));
-        myHand2.setImageResource(Utils.getDrawableResByString(this, playerCards.get(1)));
+        if (playerCards.size() > 1) {
+            myHand1.setImageResource(Utils.getDrawableResByString(this, playerCards.get(0)));
+            myHand2.setImageResource(Utils.getDrawableResByString(this, playerCards.get(1)));
+        }
         messageView.setText(texasHoldem.getMessage());
 
         ArrayList<String> tableCardList = texasHoldem.getTableCardList();
@@ -181,8 +192,22 @@ public class GameActivity extends AppCompatActivity {
     public void onMessageClicked() {
         if (texasHoldem.isEnded()) {
             texasHoldem.startRound();
-            updateUI();
+        } else if (texasHoldem.isGameFinished()) {
+            texasHoldem.startNewGame();
+            texasHoldem.startRound();
         }
+        updateUI();
+    }
+
+    @OnClick(R.id.overlay_layout)
+    public void onOverlayLayoutClicked() {
+        if (texasHoldem.isEnded()) {
+            texasHoldem.startRound();
+        } else if (texasHoldem.isGameFinished()) {
+            texasHoldem.startNewGame();
+            texasHoldem.startRound();
+        }
+        updateUI();
     }
 
     @OnClick({
@@ -214,8 +239,8 @@ public class GameActivity extends AppCompatActivity {
     private SeekBar.OnSeekBarChangeListener onRaiseValueSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            int playerMoney = texasHoldem.getPlayerMoney();
-            int changedBets = ((int) (progress * (double) playerMoney / 100) / 100) * 100;
+            int maxMoney = Math.min(texasHoldem.getPlayerMoney(), texasHoldem.getComputerMoney());
+            int changedBets = ((int) (progress * (double) maxMoney / 100) / 100) * 100;
             raiseBetsEditText.setText("" + changedBets);
         }
 
@@ -243,7 +268,7 @@ public class GameActivity extends AppCompatActivity {
             R.id.minus2
     })
     public void onAddMinusButtonClicked(Button button) {
-        int playerMoney = texasHoldem.getPlayerMoney();
+        int maxMoney = Math.min(texasHoldem.getPlayerMoney(), texasHoldem.getComputerMoney());
         int raiseBets = Integer.parseInt(raiseBetsEditText.getText().toString());
         if (raiseBets % 100 != 0) {
             raiseBets = 0;
@@ -263,8 +288,8 @@ public class GameActivity extends AppCompatActivity {
                 break;
 
         }
-        if (raiseBets > playerMoney) {
-            raiseBets = playerMoney;
+        if (raiseBets > maxMoney) {
+            raiseBets = maxMoney;
         } else if (raiseBets < 0) {
             raiseBets = 0;
         }

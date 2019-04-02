@@ -29,6 +29,9 @@ public interface GameLogDao {
     @Query("SELECT SUM(money) FROM GameLog where ai_player = :aiPlayer")
     LiveData<Double> getTotalMoney(int aiPlayer);
 
+    @Query("UPDATE  GameLog set is_sync = :isSync where uuid IN (:uuids)")
+    void updateIsSync(List<String> uuids, boolean isSync);
+
     @Insert
     void insert(GameLog gameLog);
 

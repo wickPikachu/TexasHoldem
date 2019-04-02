@@ -6,12 +6,16 @@ import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 public class GameLog {
 
     @PrimaryKey(autoGenerate = true)
     private int uid;
+
+    @ColumnInfo(name = "uuid")
+    private String uuid;
 
     @ColumnInfo(name = "result")
     private String result;
@@ -36,11 +40,13 @@ public class GameLog {
     private Date createdAt;
 
     public GameLog() {
+        this.isSync = false;
+        this.uuid = UUID.randomUUID().toString();
     }
 
     public GameLog(String data) {
+        super();
         this.result = data;
-        this.isSync = false;
     }
 
     public int getUid() {
@@ -69,6 +75,14 @@ public class GameLog {
 
     public void setMoney(double money) {
         this.money = money;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public void setSync(boolean sync) {

@@ -3,6 +3,7 @@ package hk.edu.cityu.cs.fyp.texasholdem.model;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,7 +23,6 @@ public class Cards implements Comparable<Cards> {
         CARD_NUMBER_LIST.add('2');
         CARD_NUMBER_LIST.add('3');
         CARD_NUMBER_LIST.add('4');
-
         CARD_NUMBER_LIST.add('5');
         CARD_NUMBER_LIST.add('6');
         CARD_NUMBER_LIST.add('7');
@@ -303,8 +303,9 @@ public class Cards implements Comparable<Cards> {
 
     private void setKicksFromSuitList(ArrayList<Integer> suitList) {
         Collections.sort(suitList);
-        for (int i = suitList.size(); i > 0; i--) {
-            kicks[suitList.size() - i] = suitList.get(i - 1);
+        int size = suitList.size();
+        for (int i = 0; i < 5; i++) {
+            kicks[i] = suitList.get(size - i - 1);
         }
     }
 
@@ -488,5 +489,16 @@ public class Cards implements Comparable<Cards> {
             return new int[]{0};
         }
         return result;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        String name = combination.name();
+        if (combination == Combination.None) {
+            name = "Highcard";
+        }
+
+        return name;
     }
 }

@@ -65,4 +65,8 @@ public class Utils {
         }
         return array;
     }
+
+    public static String toNumSuitFormat(String cardStr) {
+        return String.valueOf(cardStr.charAt(1)).toUpperCase() + cardStr.charAt(0);
+    }
 }
