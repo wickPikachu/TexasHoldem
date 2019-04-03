@@ -9,20 +9,6 @@ public class MiniMaxAIPlayer extends AIPlayer {
     public static final String TAG = "MiniMaxAIPlayer";
     public static final String NAME = "MiniMax AIPlayer";
 
-    double Pr2 = 4;
-    double Pr3 = 4;
-    double Pr4 = 4;
-    double Pr5 = 4;
-    double Pr6 = 4;
-    double Pr7 = 4;
-    double Pr8 = 4;
-    double Pr9 = 4;
-    double PrT = 4;
-    double PrJ = 4;
-    double PrQ = 4;
-    double PrK = 4;
-    double PrA = 4;
-
     private long originalCards = 0xFFFFFFFFFFFFFL;
     private HashMap<Cards.Combination, Double> probMap = new HashMap<>();
     private long cards = 0L;
@@ -79,7 +65,6 @@ public class MiniMaxAIPlayer extends AIPlayer {
     }
 
     public int getBestAction() {
-
         return 0;
     }
 

@@ -33,13 +33,11 @@ public class TexasHoldem {
     private AIPlayer aiPlayer;
     // for save log to db
     private boolean isSaveLogs = true;
-    private boolean isPlayerBuildBets;
+    private boolean isPlayerBigBuildBets;
     // this round is player action first (computer is big blind bets)
     private boolean isPlayerActionFirst;
     // init = 0, start from 1
     private int rounds;
-    // init = 0, start from 1
-    private int turn;
     private String message;
     // check is init
     private boolean isInit = false;
@@ -68,6 +66,7 @@ public class TexasHoldem {
     private String cardHistory;
     private String betsResult;
     private String gameLogResults;
+    private double bb;
 
     public static TexasHoldem getInstance() {
         return ourInstance;
@@ -88,10 +87,9 @@ public class TexasHoldem {
 
     public void startNewGame() {
         isPlayerActionFirst = true;
-        isPlayerBuildBets = true;
+        isPlayerBigBuildBets = true;
 
         rounds = 0;
-        turn = 0;
         playerMoney = 20000;
         playerBets = 0;
         computerMoney = 20000;
@@ -108,18 +106,19 @@ public class TexasHoldem {
         gameLogResults = "";
         computerBets = 0;
         playerBets = 0;
+        bb = 0;
         playerCardList.clear();
         computerCardList.clear();
         tableCardList.clear();
         deck.clear();
 
         rounds += 1;
-        isPlayerBuildBets = !isPlayerBuildBets;
+        isPlayerBigBuildBets = !isPlayerBigBuildBets;
         message = "Round " + rounds + " start";
 
         // Game finish if cannot play next round
         // TODO: change who action first
-        if (isPlayerBuildBets) {
+        if (isPlayerBigBuildBets) {
             if (playerMoney < BIG_BLIND_BET || computerMoney < BIG_BLIND_BET / 2) {
                 gameFinished();
                 return;
@@ -184,7 +183,6 @@ public class TexasHoldem {
             cardHistory += Utils.toNumSuitFormat(card);
         }
         actionHistory += "/";
-        ++turn;
     }
 
     /**
@@ -205,6 +203,7 @@ public class TexasHoldem {
                     gameLog.setResult(gameLogResults);
                     gameLog.setAiPlayer(aiPlayer.getConstantValue());
                     gameLog.setMoney(Double.valueOf(betsArray[0]));
+                    gameLog.setBb(bb);
                     TexasHoldemApplication.db.getResultDao().insert(gameLog);
                 }
             };
@@ -309,6 +308,7 @@ public class TexasHoldem {
         message = String.format("You Win! +%d\n(%s)", computerBets, reason);
         int totalBets = getTotalBets();
         playerMoney += totalBets;
+        bb += isPlayerBigBuildBets ? 1 : 0.5;
         betsResult = (computerBets) + "|" + (-computerBets);
     }
 
@@ -316,6 +316,7 @@ public class TexasHoldem {
         message = String.format("You Lose! -%d\n(%s)", playerBets, reason);
         int totalBets = getTotalBets();
         computerMoney += totalBets;
+        bb += isPlayerBigBuildBets ? -1 : -0.5;
         betsResult = (-playerBets) + "|" + playerBets;
     }
 
@@ -324,6 +325,7 @@ public class TexasHoldem {
         int totalBets = getTotalBets();
         playerMoney += totalBets / 2;
         computerMoney += totalBets / 2;
+        bb += 0;
         betsResult = "0|0";
     }
 
@@ -352,6 +354,20 @@ public class TexasHoldem {
         tempList.addAll(computerCardList);
         tempList.addAll(tableCardList);
         return tempList.toArray(new String[0]);
+    }
+
+    public int getTurn() {
+        switch (tableCardList.size()) {
+            case 0:
+                return 0;
+            case 3:
+                return 1;
+            case 4:
+                return 2;
+            case 5:
+                return 3;
+        }
+        return 0;
     }
 
     public boolean isPlayerTurn() {
@@ -424,8 +440,8 @@ public class TexasHoldem {
         return tableCardList;
     }
 
-    public boolean isPlayerBuildBets() {
-        return isPlayerBuildBets;
+    public boolean isPlayerBigBuildBets() {
+        return isPlayerBigBuildBets;
     }
 
     public String getMessage() {
@@ -438,5 +454,24 @@ public class TexasHoldem {
 
     public void setSaveLogs(boolean saveLogs) {
         isSaveLogs = saveLogs;
+    }
+
+    /**
+     * For machine learning AI Player socket Call
+     *
+     * @return double[]
+     */
+    public double[] getSocketCallWithCards() {
+        double[] doubles = new double[14];
+        doubles[0] = Utils.valueOfCard(computerCardList.get(0)) + 1;
+        doubles[1] = Utils.suitOfCard(computerCardList.get(0));
+        doubles[2] = Utils.valueOfCard(computerCardList.get(1)) + 1;
+        doubles[3] = Utils.suitOfCard(computerCardList.get(1));
+
+        for (int i = 0; i < tableCardList.size(); i += 2) {
+            doubles[4 + i] = Utils.valueOfCard(tableCardList.get(i)) + 1;
+            doubles[5 + i] = Utils.suitOfCard(tableCardList.get(i));
+        }
+        return doubles;
     }
 }

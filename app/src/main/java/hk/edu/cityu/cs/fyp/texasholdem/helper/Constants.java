@@ -22,6 +22,8 @@ public class Constants {
         String KEY_DATA = "data";
         String KEY_TYPE = "type";
         String KEY_SUCCESS = "success";
+        String KEY_INPUT= "input";
+        String KEY_OUTPUT= "output";
     }
 
     public static final int AI_PLAYER_RANDOM = 1;

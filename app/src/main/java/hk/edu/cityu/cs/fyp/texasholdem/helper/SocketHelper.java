@@ -13,9 +13,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
 
+import hk.edu.cityu.cs.fyp.texasholdem.BuildConfig;
 import hk.edu.cityu.cs.fyp.texasholdem.db.GameLog;
 
 public class SocketHelper {
@@ -32,8 +34,8 @@ public class SocketHelper {
     private BufferedWriter bufferedWriter;
     private BufferedReader bufferedReader;
     private SocketListener socketListener;
-    private String ipAddress;
-    private int port;
+    private String ipAddress = BuildConfig.SERVER_URL;
+    private int port = BuildConfig.SERVER_PORT;
 
     public static SocketHelper getInstance() {
         return ourInstance;
@@ -49,10 +51,8 @@ public class SocketHelper {
     private SocketHelper() {
     }
 
-    public void connectToServer(String ipAddress, int port, SocketListener socketListener) {
+    public void connectToServer(SocketListener socketListener) {
         if (socket == null || socket.isClosed()) {
-            this.ipAddress = ipAddress;
-            this.port = port;
             this.socketListener = socketListener;
             handler.post(Connection);
         } else {
@@ -64,7 +64,8 @@ public class SocketHelper {
         @Override
         public void run() {
             try {
-                socket = new Socket(ipAddress, port);
+                InetAddress inetAddress = InetAddress.getByName(ipAddress);
+                socket = new Socket(inetAddress, port);
                 bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
@@ -99,15 +100,13 @@ public class SocketHelper {
     });
 
     public void sent(JSONObject jsonObject) {
-        handler.post(() -> {
-            try {
-                bufferedWriter.write(jsonObject.toString() + "\n");
-                bufferedWriter.flush();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.e(TAG, "sent: " + e.getLocalizedMessage());
-            }
-        });
+        try {
+            bufferedWriter.write(jsonObject.toString() + "\n");
+            bufferedWriter.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "sent: " + e.getLocalizedMessage());
+        }
     }
 
     public void uploadGameLog(List<GameLog> gameLogs) {
@@ -131,7 +130,7 @@ public class SocketHelper {
     }
 
     public void disconnect() {
-        handler.post(() -> {
+        new Thread(() -> {
             try {
                 bufferedWriter.close();
                 bufferedReader.close();
@@ -140,7 +139,7 @@ public class SocketHelper {
                 e.printStackTrace();
                 Log.e(TAG, "disconnect: " + e.getLocalizedMessage());
             }
-        });
+        }).start();
     }
 
     public interface SocketListener {

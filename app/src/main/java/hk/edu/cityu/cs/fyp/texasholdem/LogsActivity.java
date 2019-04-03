@@ -141,7 +141,7 @@ public class LogsActivity extends AppCompatActivity {
 
     @OnClick(R.id.sync_button)
     public void onSyncButtonClicked() {
-        socketHelper.connectToServer("10.0.2.2", BuildConfig.SERVER_PORT, new SocketHelper.SocketListener() {
+        socketHelper.connectToServer(new SocketHelper.SocketListener() {
             @Override
             public void onResponse(JSONObject jsonObject) {
                 Log.d(TAG, "onResponse: " + jsonObject.toString());
