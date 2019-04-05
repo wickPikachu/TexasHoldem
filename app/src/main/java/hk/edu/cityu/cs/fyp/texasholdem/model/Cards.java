@@ -35,7 +35,7 @@ public class Cards implements Comparable<Cards> {
         CARD_NUMBER_LIST.add('a');
     }
 
-    enum Combination {
+    public enum Combination {
         None(0),
         Pair(1),
         TwoPairs(1 << 1),
@@ -104,7 +104,17 @@ public class Cards implements Comparable<Cards> {
         return 1L << (CARD_NUMBER_LIST.indexOf(cardNumber) * 4) << CARD_SUIT_LIST.indexOf(cardClass);
     }
 
-    private static int countSameNum(long cards) {
+    public static int getNumberOfCards(long cards) {
+        int count = 0;
+        for (int i = 0; i < 52; i++) {
+            if (((cards >> i) & 0x1L) == 0x1L) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static int countSameNum(long cards) {
         int count = 0;
         long tempCards = cards;
         for (int i = 0; i < 4; i++) {

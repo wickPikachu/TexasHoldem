@@ -28,7 +28,6 @@ import hk.edu.cityu.cs.fyp.texasholdem.db.GameLog;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.SharedPreferencesHelper;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.SocketHelper;
-import hk.edu.cityu.cs.fyp.texasholdem.model.TexasHoldem;
 import hk.edu.cityu.cs.fyp.texasholdem.viewmodel.LogsViewModel;
 
 public class LogsActivity extends AppCompatActivity {
@@ -111,6 +110,11 @@ public class LogsActivity extends AppCompatActivity {
             }
             updateUI();
         });
+
+        // TODO: delete, for test save csv
+        new Thread(() -> {
+            TexasHoldemApplication.db.getResultDao().updateAllIsSync(false);
+        }).start();
     }
 
     Spinner.OnItemSelectedListener onItemSelectedListener = new Spinner.OnItemSelectedListener() {
@@ -125,6 +129,12 @@ public class LogsActivity extends AppCompatActivity {
         }
     };
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        socketHelper.disconnect();
+    }
+
     @SuppressLint("DefaultLocale")
     public void updateUI() {
         if (unsyncGameLogs != null)
@@ -132,7 +142,7 @@ public class LogsActivity extends AppCompatActivity {
         int unsyncNum = hands - syncNum;
         logDetail.setText(String.format("Hands: %d\n" +
                         "Win rate (bb/100): %.1f\n" +
-                        "Total win money: %.0f\n" +
+                        "Total money earned: %.0f\n" +
                         "Synchronized: %d\n" +
                         "Un-synchronized: %d\n"
                 , hands, bb100, totalMoney, syncNum, unsyncNum));

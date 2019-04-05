@@ -15,7 +15,9 @@ public class MachineLearningAIPlayer extends AIPlayer {
     private SocketHelper socketHelper = SocketHelper.getInstance();
     private TexasHoldem texasHoldem;
 
-    public MachineLearningAIPlayer() {
+    @Override
+    public void takeAction(TexasHoldem texasHoldem) {
+        this.texasHoldem = texasHoldem;
         socketHelper.connectToServer(new SocketHelper.SocketListener() {
             @Override
             public void onResponse(JSONObject jsonObject) {
@@ -39,6 +41,7 @@ public class MachineLearningAIPlayer extends AIPlayer {
                         }
 
                     } catch (Exception e) {
+                        Log.e(TAG, "onResponse: " + e.getLocalizedMessage());
                         e.printStackTrace();
                     }
 
@@ -50,37 +53,41 @@ public class MachineLearningAIPlayer extends AIPlayer {
                 Log.e(TAG, "onError: " + errorMsg);
             }
         });
-    }
 
-    @Override
-    public void takeAction(TexasHoldem texasHoldem) {
-        this.texasHoldem = texasHoldem;
         int[] turnArray = new int[]{0, 0, 0, 0};
         turnArray[texasHoldem.getTurn()] = 1;
         double potRatio = (double) (texasHoldem.getTotalBets() - texasHoldem.getPlayerBets()) / texasHoldem.getTotalBets();
-        new Thread(() -> {
-            try {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put(Constants.Json.KEY_ACTION, 2);
-                JSONArray jsonArray = new JSONArray();
-                // turn
-                for (int t : turnArray) {
-                    jsonArray.put(t);
-                }
-                // cards
-                for (double d : texasHoldem.getSocketCallWithCards()) {
-                    jsonArray.put(d);
-                }
-                // pot ratio
-                jsonArray.put(potRatio);
-                jsonObject.put(Constants.Json.KEY_INPUT, jsonArray);
-                Log.d(TAG, "takeAction: " + jsonObject.toString());
-                socketHelper.sent(jsonObject);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.e(TAG, "takeAction: " + e.getLocalizedMessage());
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(Constants.Json.KEY_ACTION, 2);
+            JSONArray jsonArray = new JSONArray();
+            // turn
+            for (int t : turnArray) {
+                jsonArray.put(t);
             }
-        }).start();
+            // cards
+            for (double d : texasHoldem.getSocketCallWithCards()) {
+                jsonArray.put(d);
+            }
+            // pot ratio
+            jsonArray.put(potRatio);
+            jsonObject.put(Constants.Json.KEY_INPUT, jsonArray);
+            Log.d(TAG, "takeAction: " + jsonObject.toString());
+            socketHelper.sent(jsonObject);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "takeAction: " + e.getLocalizedMessage());
+        }
+    }
+
+    public int calculateRaiseBets(double f, double c, double r) {
+        int bet = 0;
+
+        return bet;
+    }
+
+    public void disconnectSocket() {
+        socketHelper.disconnect();
     }
 
     @Override

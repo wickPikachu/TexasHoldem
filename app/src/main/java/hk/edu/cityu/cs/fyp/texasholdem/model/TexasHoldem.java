@@ -34,13 +34,16 @@ public class TexasHoldem {
     // for save log to db
     private boolean isSaveLogs = true;
     private boolean isPlayerBigBuildBets;
-    // this round is player action first (computer is big blind bets)
-    private boolean isPlayerActionFirst;
+    // this round (turn 1) is player action first (computer is big blind bets) => true
+    // then turn 2,3,4 is computer action first => false
+    private boolean isPlayerAction;
     // init = 0, start from 1
     private int rounds;
+    private int turn;
     private String message;
     // check is init
     private boolean isInit = false;
+    private int pot;
 
     enum GameState {
         PlayerTurn,
@@ -86,7 +89,7 @@ public class TexasHoldem {
     }
 
     public void startNewGame() {
-        isPlayerActionFirst = true;
+        isPlayerAction = true;
         isPlayerBigBuildBets = true;
 
         rounds = 0;
@@ -94,6 +97,7 @@ public class TexasHoldem {
         playerBets = 0;
         computerMoney = 20000;
         computerBets = 0;
+        pot = 0;
     }
 
     /**
@@ -107,11 +111,13 @@ public class TexasHoldem {
         computerBets = 0;
         playerBets = 0;
         bb = 0;
+        pot = 0;
         playerCardList.clear();
         computerCardList.clear();
         tableCardList.clear();
         deck.clear();
 
+        turn = 0;
         rounds += 1;
         isPlayerBigBuildBets = !isPlayerBigBuildBets;
         message = "Round " + rounds + " start";
@@ -162,6 +168,8 @@ public class TexasHoldem {
     }
 
     public void next() {
+        pot += playerBets + computerBets;
+        computerBets = playerBets = 0;
         String card;
         if (tableCardList.isEmpty()) {
             cardHistory += "/";
@@ -174,8 +182,9 @@ public class TexasHoldem {
             card = deck.pop();
             tableCardList.add(card);
             cardHistory += Utils.toNumSuitFormat(card);
-        } else if (tableCardList.size() == 5) {
+        } else if (tableCardList.size() == 5) { // table cards size is 5
             determineWinner();
+            return;
         } else {    // table cards size is 3 or 4
             cardHistory += "/";
             card = deck.pop();
@@ -183,6 +192,8 @@ public class TexasHoldem {
             cardHistory += Utils.toNumSuitFormat(card);
         }
         actionHistory += "/";
+        turn++;
+        gameState = isPlayerBigBuildBets ? GameState.PlayerTurn : GameState.ComputerTurn;
     }
 
     /**
@@ -190,7 +201,8 @@ public class TexasHoldem {
      */
     public void endRound() {
         actionHistory += "";
-        gameLogResults += "STATE:" + rounds + ":" + actionHistory + ":" + cardHistory + ":" + betsResult;
+        String playerHistory = isPlayerBigBuildBets ? "AIPlayer|Human" : "Human|AIPlayer";
+        gameLogResults += "STATE:" + rounds + ":" + actionHistory + ":" + cardHistory + ":" + betsResult + ":" + playerHistory;
 //        message = "This round winner is ";
         gameState = GameState.Ended;
         String[] betsArray = betsResult.split("\\|");
@@ -260,6 +272,7 @@ public class TexasHoldem {
         playerBets += raiseBets;
         actionHistory += "r" + playerBets;
         gameState = GameState.PlayerRaised;
+        isPlayerAction = false;
     }
 
     public void computerFold() {
@@ -370,15 +383,23 @@ public class TexasHoldem {
         return 0;
     }
 
-    public boolean isPlayerTurn() {
+    public void disconnectSocketIfNeeded() {
+        if (aiPlayer instanceof MachineLearningAIPlayer) {
+            ((MachineLearningAIPlayer) aiPlayer).disconnectSocket();
+        }
+    }
+
+    public boolean isPlayerAction() {
         if (gameState == GameState.GameFinished)
             return false;
+//        return isPlayerAction || gameState == GameState.PlayerTurn;
         return gameState == GameState.PlayerTurn || gameState == GameState.ComputerCalled || gameState == GameState.ComputerRaised;
     }
 
-    public boolean isComputerTurn() {
+    public boolean isComputerAction() {
         if (gameState == GameState.GameFinished)
             return false;
+//        return !isPlayerAction || gameState == GameState.ComputerTurn;
         return gameState == GameState.ComputerTurn || gameState == GameState.PlayerCalled || gameState == GameState.PlayerRaised;
     }
 
@@ -409,7 +430,7 @@ public class TexasHoldem {
     }
 
     public int getTotalBets() {
-        return playerBets + computerBets;
+        return pot + playerBets + computerBets;
     }
 
     public int getPlayerMoney() {
@@ -454,6 +475,10 @@ public class TexasHoldem {
 
     public void setSaveLogs(boolean saveLogs) {
         isSaveLogs = saveLogs;
+    }
+
+    public int getPot() {
+        return pot;
     }
 
     /**

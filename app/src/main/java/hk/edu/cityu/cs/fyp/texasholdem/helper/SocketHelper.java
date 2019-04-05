@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 import hk.edu.cityu.cs.fyp.texasholdem.BuildConfig;
@@ -36,6 +37,7 @@ public class SocketHelper {
     private SocketListener socketListener;
     private String ipAddress = BuildConfig.SERVER_URL;
     private int port = BuildConfig.SERVER_PORT;
+    private ArrayList<SocketListener> socketListeners = new ArrayList<>();
 
     public static SocketHelper getInstance() {
         return ourInstance;
@@ -54,30 +56,23 @@ public class SocketHelper {
     public void connectToServer(SocketListener socketListener) {
         if (socket == null || socket.isClosed()) {
             this.socketListener = socketListener;
-            handler.post(Connection);
+            handler.post(() -> {
+                try {
+                    InetAddress inetAddress = InetAddress.getByName(ipAddress);
+                    socket = new Socket(inetAddress, port);
+                    bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                    bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    recvThread.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "run: " + e.getLocalizedMessage());
+                }
+            });
         } else {
-            Log.e(TAG, "connectToServer: socket already connect to " + this.ipAddress + ":" + this.port);
+            Log.d(TAG, "connectToServer: socket already connect to " + this.ipAddress + ":" + this.port);
         }
+        socketListeners.add(socketListener);
     }
-
-    private Runnable Connection = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                InetAddress inetAddress = InetAddress.getByName(ipAddress);
-                socket = new Socket(inetAddress, port);
-                bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-                bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-                recvThread.start();
-            } catch (Exception e) {
-                e.printStackTrace();
-                socketListener.onError(e.getLocalizedMessage());
-                Log.e(TAG, "run: " + e.getLocalizedMessage());
-            }
-
-        }
-    };
 
     private Thread recvThread = new Thread(() -> {
         try {
@@ -88,25 +83,33 @@ public class SocketHelper {
                     continue;
                 try {
                     JSONObject message = new JSONObject(msg);
-                    socketListener.onResponse(message);
+                    for (SocketListener socketListener : socketListeners) {
+                        socketListener.onResponse(message);
+                    }
                 } catch (JSONException je) {
+                    for (SocketListener socketListener : socketListeners) {
+                        socketListener.onError(je.getLocalizedMessage());
+                    }
                     Log.e(TAG, "recvThread: JSONException: " + je.getLocalizedMessage());
                 }
             }
         } catch (Exception e) {
             Log.e(TAG, "recvThread: " + e.getLocalizedMessage());
             disconnect();
+            clearSocketListeners();
         }
     });
 
     public void sent(JSONObject jsonObject) {
-        try {
-            bufferedWriter.write(jsonObject.toString() + "\n");
-            bufferedWriter.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e(TAG, "sent: " + e.getLocalizedMessage());
-        }
+        handler.post(() -> {
+            try {
+                bufferedWriter.write(jsonObject.toString() + "\n");
+                bufferedWriter.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e(TAG, "sent: " + e.getLocalizedMessage());
+            }
+        });
     }
 
     public void uploadGameLog(List<GameLog> gameLogs) {
@@ -129,8 +132,20 @@ public class SocketHelper {
         });
     }
 
+    public void clearSocketListeners() {
+        socketListeners.clear();
+    }
+
+    public void removeSocketListener(SocketHelper socketHelper) {
+        socketListeners.remove(socketListener);
+    }
+
+    public void addSocketListener(SocketListener socketListener) {
+        socketListeners.add(socketListener);
+    }
+
     public void disconnect() {
-        new Thread(() -> {
+        handler.post(() -> {
             try {
                 bufferedWriter.close();
                 bufferedReader.close();
@@ -139,7 +154,7 @@ public class SocketHelper {
                 e.printStackTrace();
                 Log.e(TAG, "disconnect: " + e.getLocalizedMessage());
             }
-        }).start();
+        });
     }
 
     public interface SocketListener {

@@ -29,12 +29,10 @@ public class LogsViewModel extends ViewModel {
         countAllGameLogsLive = Transformations.switchMap(aiPlayerValueLive, (aiPlayer) -> gameLogDao.countGameLogsByAIPlayer(aiPlayer));
         sumbbLive = Transformations.switchMap(aiPlayerValueLive, (aiPlayer) -> gameLogDao.sumbb(aiPlayer));
         totalMoneyLive = Transformations.switchMap(aiPlayerValueLive, (aiPlayer) -> gameLogDao.getTotalMoney(aiPlayer));
+        logsLive = Transformations.switchMap(aiPlayerValueLive, (aiPlayer) -> gameLogDao.findUnsyncGameLogs(aiPlayer));
     }
 
     public LiveData<List<GameLog>> getUnsyncGameLogsLive() {
-        if (logsLive == null) {
-            logsLive = gameLogDao.findUnsyncGameLogs();
-        }
         return logsLive;
     }
 

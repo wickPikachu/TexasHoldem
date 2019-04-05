@@ -14,6 +14,9 @@ public interface GameLogDao {
     @Query("SELECT * FROM GameLog WHERE is_sync = 0")
     LiveData<List<GameLog>> findUnsyncGameLogs();
 
+    @Query("SELECT * FROM GameLog WHERE is_sync = 0 and ai_player = :aiPlayer")
+    LiveData<List<GameLog>> findUnsyncGameLogs(int aiPlayer);
+
     @Query("SELECT * FROM GameLog")
     LiveData<List<GameLog>> findAllGameLogs();
 
@@ -31,6 +34,10 @@ public interface GameLogDao {
 
     @Query("UPDATE  GameLog set is_sync = :isSync where uuid IN (:uuids)")
     void updateIsSync(List<String> uuids, boolean isSync);
+
+    @Deprecated
+    @Query("UPDATE  GameLog set is_sync = :isSync where 1")
+    void updateAllIsSync(boolean isSync);
 
     @Insert
     void insert(GameLog gameLog);

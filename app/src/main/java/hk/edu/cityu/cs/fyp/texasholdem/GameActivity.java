@@ -95,6 +95,9 @@ public class GameActivity extends AppCompatActivity {
     @BindView(R.id.overlay_message)
     TextView overlayMessageText;
 
+    @BindView(R.id.pot_money)
+    TextView potText;
+
     GameViewModel gameViewModel;
     TexasHoldem texasHoldem;
     AIPlayer aiPlayer;
@@ -135,15 +138,18 @@ public class GameActivity extends AppCompatActivity {
 
     private void updateUI() {
         // AIPlayer turn
-        if (texasHoldem.isComputerTurn()) {
+        if (texasHoldem.isComputerAction()) {
             texasHoldem.takeAction(aiPlayer);
         }
 
-        overlayLayout.setVisibility(texasHoldem.isGameFinished() || texasHoldem.isEnded() ? View.VISIBLE : View.INVISIBLE);
+        overlayLayout.setVisibility(texasHoldem.isGameFinished() ? View.VISIBLE : View.INVISIBLE);
         overlayMessageText.setText(texasHoldem.getMessage());
 
         if (texasHoldem.isBothCalled()) {
             texasHoldem.next();
+            if (texasHoldem.isComputerAction()) {
+                texasHoldem.takeAction(aiPlayer);
+            }
         }
 
         if (texasHoldem.isEnded()) {
@@ -159,6 +165,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
         roundText.setText(String.format("Round: %d", texasHoldem.getRounds()));
+        potText.setText("Pot: " + (texasHoldem.getPot() > 0 ? "$" + texasHoldem.getPot() : "--"));
 
         myMoneyText.setText("$" + texasHoldem.getPlayerMoney());
         myBetsMoneyText.setText("Bet: $" + texasHoldem.getPlayerBets());
@@ -181,10 +188,14 @@ public class GameActivity extends AppCompatActivity {
             tableCards.get(i).setImageResource(Utils.getDrawableResByString(this, tableCardList.get(i)));
         }
 
-        if (texasHoldem.isPlayerTurn()) {
+        if (texasHoldem.isPlayerAction()) {
             foldButton.setEnabled(true);
             callButton.setEnabled(true);
             raiseButton.setEnabled(true);
+        } else if (texasHoldem.isComputerAction()) {
+            foldButton.setEnabled(false);
+            callButton.setEnabled(false);
+            raiseButton.setEnabled(false);
         }
     }
 
@@ -224,7 +235,7 @@ public class GameActivity extends AppCompatActivity {
                 texasHoldem.playerCall();
                 break;
             case R.id.raise:
-                int raiseBets = Integer.parseInt(raiseBetsEditText.getText().toString());
+                int raiseBets = Integer.parseInt(raiseBetsEditText.getText().toString().trim());
                 try {
                     texasHoldem.playerRaise(raiseBets);
                 } catch (TexasHoldemException e) {
@@ -234,6 +245,12 @@ public class GameActivity extends AppCompatActivity {
         }
 
         updateUI();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        texasHoldem.disconnectSocketIfNeeded();
     }
 
     private SeekBar.OnSeekBarChangeListener onRaiseValueSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {

@@ -90,6 +90,18 @@
         app:layout_constraintTop_toBottomOf="@+id/computer_layout">
 
         <TextView
+            android:id="@+id/pot_money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/table_card1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Pot: $200" />
+
+        <TextView
             android:id="@+id/computer_bets_money"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -182,7 +194,7 @@
         android:padding="8dp"
         android:textAlignment="center"
         android:textColor="#ffffff"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/buttons_layout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -401,6 +413,8 @@
             tools:text="$20000" />
 
     </android.support.constraint.ConstraintLayout>
+
+    <!-- Overlay layout -->
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/overlay_layout"
