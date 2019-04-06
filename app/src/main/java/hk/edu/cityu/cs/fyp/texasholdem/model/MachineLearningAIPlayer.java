@@ -1,10 +1,13 @@
 package hk.edu.cityu.cs.fyp.texasholdem.model;
 
+import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.SocketHelper;
 
@@ -14,6 +17,11 @@ public class MachineLearningAIPlayer extends AIPlayer {
     private static final String TAG = "MachineLearningAIPlayer";
     private SocketHelper socketHelper = SocketHelper.getInstance();
     private TexasHoldem texasHoldem;
+    private Activity activity;
+
+    public MachineLearningAIPlayer(Activity activity) {
+        this.activity = activity;
+    }
 
     @Override
     public void takeAction(TexasHoldem texasHoldem) {
@@ -31,14 +39,21 @@ public class MachineLearningAIPlayer extends AIPlayer {
                         if (texasHoldem == null)
                             return;
                         // TODO: take action
-                        if (probFold > probCall && probFold > probRaise) {
-                            texasHoldem.computerFold();
-                        } else if (probCall > probRaise) {
-                            texasHoldem.computerCall();
-                        } else {
-                            int bet = 100;
-                            texasHoldem.computerRaise(bet);
-                        }
+
+                        activity.runOnUiThread(() -> {
+                            if (probFold > probCall && probFold > probRaise) {
+                                texasHoldem.computerFold();
+                            } else if (probCall > probRaise) {
+                                texasHoldem.computerCall();
+                            } else {
+                                int bet = calculateRaiseBets(probCall, probRaise);
+                                try {
+                                    texasHoldem.computerRaise(bet);
+                                } catch (TexasHoldemException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
 
                     } catch (Exception e) {
                         Log.e(TAG, "onResponse: " + e.getLocalizedMessage());
@@ -80,9 +95,9 @@ public class MachineLearningAIPlayer extends AIPlayer {
         }
     }
 
-    public int calculateRaiseBets(double f, double c, double r) {
+    public int calculateRaiseBets(double c, double r) {
         int bet = 0;
-
+        double raise = r - c;
         return bet;
     }
 

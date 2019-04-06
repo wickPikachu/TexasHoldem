@@ -12,6 +12,10 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +25,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
 import hk.edu.cityu.cs.fyp.texasholdem.db.GameLog;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.SharedPreferencesHelper;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.SocketHelper;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 import hk.edu.cityu.cs.fyp.texasholdem.model.AIPlayer;
 import hk.edu.cityu.cs.fyp.texasholdem.model.RandomAIPlayer;
@@ -102,6 +108,7 @@ public class GameActivity extends AppCompatActivity {
     TexasHoldem texasHoldem;
     AIPlayer aiPlayer;
     List<GameLog> unSyncGameLogs;
+    SocketHelper socketHelper = SocketHelper.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +136,20 @@ public class GameActivity extends AppCompatActivity {
         raiseBetsEditText.setText("200");
 
         texasHoldem = TexasHoldem.getInstance();
-        texasHoldem.init(aiPlayer);
+        texasHoldem.init(aiPlayer, new TexasHoldem.TexasHoldemListener() {
+            @Override
+            public void afterComputerTakeAction() {
+                updateUI();
+            }
+
+            @Override
+            public void onGameIsFinished() {
+                overlayLayout.setVisibility(View.VISIBLE);
+                overlayMessageText.setText(texasHoldem.getMessage());
+                updateUI();
+            }
+        });
+        texasHoldem.setAutoSync(SharedPreferencesHelper.getIsAIPlayerAutoSync(this, aiPlayer.getConstantValue()));
 
         raiseValueSeekBar.setOnSeekBarChangeListener(onRaiseValueSeekBarChangeListener);
         texasHoldem.startRound();
@@ -141,9 +161,6 @@ public class GameActivity extends AppCompatActivity {
         if (texasHoldem.isComputerAction()) {
             texasHoldem.takeAction(aiPlayer);
         }
-
-        overlayLayout.setVisibility(texasHoldem.isGameFinished() ? View.VISIBLE : View.INVISIBLE);
-        overlayMessageText.setText(texasHoldem.getMessage());
 
         if (texasHoldem.isBothCalled()) {
             texasHoldem.next();
@@ -218,6 +235,7 @@ public class GameActivity extends AppCompatActivity {
             texasHoldem.startNewGame();
             texasHoldem.startRound();
         }
+        overlayLayout.setVisibility(View.INVISIBLE);
         updateUI();
     }
 

@@ -48,7 +48,7 @@ public class LogsActivity extends AppCompatActivity {
     AIPlayerNameAdapter aiPlayerNameAdapter;
     int aiPlayerValue;
     int hands = 0;
-    double bb100 = 0;
+    double sumMoneyDivideBybb = 0;
     double totalMoney = 0;
     int syncNum = 0;
     SocketHelper socketHelper = SocketHelper.getInstance();
@@ -93,11 +93,11 @@ public class LogsActivity extends AppCompatActivity {
             updateUI();
         });
 
-        logsViewModel.getSumbbLive().observe(this, bb -> {
+        logsViewModel.getSumMoneyDivideBybbLive().observe(this, bb -> {
             if (bb != null) {
-                bb100 = bb;
+                this.sumMoneyDivideBybb = bb;
             } else {
-                this.bb100 = 0;
+                this.sumMoneyDivideBybb = 0;
             }
             updateUI();
         });
@@ -112,9 +112,9 @@ public class LogsActivity extends AppCompatActivity {
         });
 
         // TODO: delete, for test save csv
-        new Thread(() -> {
-            TexasHoldemApplication.db.getResultDao().updateAllIsSync(false);
-        }).start();
+        TexasHoldemApplication.postToDataThread(() -> {
+//            TexasHoldemApplication.db.getResultDao().updateAllIsSync(false);
+        });
     }
 
     Spinner.OnItemSelectedListener onItemSelectedListener = new Spinner.OnItemSelectedListener() {
@@ -141,11 +141,11 @@ public class LogsActivity extends AppCompatActivity {
             Log.d(TAG, "updateUI: numberOfGameLogs: " + unsyncGameLogs.size());
         int unsyncNum = hands - syncNum;
         logDetail.setText(String.format("Hands: %d\n" +
-                        "Win rate (bb/100): %.1f\n" +
                         "Total money earned: %.0f\n" +
+                        "Win rate (bb/100): %.2f\n" +
                         "Synchronized: %d\n" +
                         "Un-synchronized: %d\n"
-                , hands, bb100, totalMoney, syncNum, unsyncNum));
+                , hands, totalMoney, sumMoneyDivideBybb / ((double) hands / 100), syncNum, unsyncNum));
         syncButton.setEnabled(unsyncNum > 0);
     }
 
@@ -155,20 +155,22 @@ public class LogsActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject jsonObject) {
                 Log.d(TAG, "onResponse: " + jsonObject.toString());
-                if (jsonObject.has(Constants.Json.KEY_SUCCESS)) {
-                    try {
-                        JSONArray uuidArray = jsonObject.getJSONArray(Constants.Json.KEY_SUCCESS);
-                        int len = uuidArray.length();
-                        ArrayList<String> uuids = new ArrayList<>();
-                        for (int i = 0; i < len; i++) {
-                            uuids.add(uuidArray.getString(i));
+                TexasHoldemApplication.postToDataThread(() -> {
+                    if (jsonObject.has(Constants.Json.KEY_SUCCESS)) {
+                        try {
+                            JSONArray uuidArray = jsonObject.getJSONArray(Constants.Json.KEY_SUCCESS);
+                            int len = uuidArray.length();
+                            ArrayList<String> uuids = new ArrayList<>();
+                            for (int i = 0; i < len; i++) {
+                                uuids.add(uuidArray.getString(i));
+                            }
+                            TexasHoldemApplication.db.getResultDao().updateIsSync(uuids, true);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                        TexasHoldemApplication.db.getResultDao().updateIsSync(uuids, true);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
 
-                }
+                    }
+                });
             }
 
             @Override
@@ -177,7 +179,7 @@ public class LogsActivity extends AppCompatActivity {
             }
         });
         // upload action
-        socketHelper.uploadGameLog(unsyncGameLogs);
+        socketHelper.uploadGameLogs(unsyncGameLogs);
     }
 
     class AIPlayerNameAdapter extends BaseAdapter {

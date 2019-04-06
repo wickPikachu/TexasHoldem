@@ -26,8 +26,8 @@ public interface GameLogDao {
     @Query("SELECT COUNT(*) FROM GameLog where ai_player = :aiPlayer and is_sync = :isSync")
     LiveData<Integer> countGameLogsByIsSyncAndAiPlayer(boolean isSync, int aiPlayer);
 
-    @Query("SELECT SUM(bb) FROM GameLog where ai_player = :aiPlayer")
-    LiveData<Double> sumbb(int aiPlayer);
+    @Query("SELECT SUM(money/bb) FROM GameLog where ai_player = :aiPlayer")
+    LiveData<Double> sumMoneyDivideBybb(int aiPlayer);
 
     @Query("SELECT SUM(money) FROM GameLog where ai_player = :aiPlayer")
     LiveData<Double> getTotalMoney(int aiPlayer);

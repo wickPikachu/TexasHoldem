@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     public void onHelpClicked() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Help");
-        builder.setMessage(Constants.HELP_MESSAGE_RULE);
+        builder.setMessage(Html.fromHtml(Constants.HELP_MESSAGE_RULE));
         View v = LinearLayout.inflate(this, R.layout.alert_help, null);
         builder.setView(v);
         builder.show();

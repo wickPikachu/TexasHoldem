@@ -27,7 +27,7 @@ public class GameLog {
     private int aiPlayer;
 
     /**
-     * for calculate bb/100
+     * the big blind bet size
      */
     @ColumnInfo(name = "bb")
     private double bb;

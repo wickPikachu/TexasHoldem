@@ -3,7 +3,6 @@ package hk.edu.cityu.cs.fyp.texasholdem.helper;
 import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -34,7 +33,6 @@ public class SocketHelper {
     private Socket socket;
     private BufferedWriter bufferedWriter;
     private BufferedReader bufferedReader;
-    private SocketListener socketListener;
     private String ipAddress = BuildConfig.SERVER_URL;
     private int port = BuildConfig.SERVER_PORT;
     private ArrayList<SocketListener> socketListeners = new ArrayList<>();
@@ -55,7 +53,6 @@ public class SocketHelper {
 
     public void connectToServer(SocketListener socketListener) {
         if (socket == null || socket.isClosed()) {
-            this.socketListener = socketListener;
             handler.post(() -> {
                 try {
                     InetAddress inetAddress = InetAddress.getByName(ipAddress);
@@ -112,7 +109,25 @@ public class SocketHelper {
         });
     }
 
-    public void uploadGameLog(List<GameLog> gameLogs) {
+    public void uploadGameLog(GameLog gameLog) {
+        handler.post(() -> {
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put(Constants.Json.KEY_ACTION, 1);
+                jsonObject.put(Constants.Json.KEY_DATA, gameLog.getResult());
+                jsonObject.put(Constants.Json.KEY_TYPE, gameLog.getAiPlayer());
+                jsonObject.put(Constants.Json.KEY_UUID, gameLog.getUuid());
+                Log.d(TAG, "uploadGameLog: " + jsonObject.toString());
+                bufferedWriter.write(jsonObject.toString() + "\n");
+                bufferedWriter.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e(TAG, "uploadGameLog: " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void uploadGameLogs(List<GameLog> gameLogs) {
         handler.post(() -> {
             try {
                 for (GameLog gameLog : gameLogs) {
@@ -121,13 +136,13 @@ public class SocketHelper {
                     jsonObject.put(Constants.Json.KEY_DATA, gameLog.getResult());
                     jsonObject.put(Constants.Json.KEY_TYPE, gameLog.getAiPlayer());
                     jsonObject.put(Constants.Json.KEY_UUID, gameLog.getUuid());
-                    Log.d(TAG, "uploadGameLog: " + jsonObject.toString());
+                    Log.d(TAG, "uploadGameLogs: " + jsonObject.toString());
                     bufferedWriter.write(jsonObject.toString() + "\n");
                     bufferedWriter.flush();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.e(TAG, "uploadGameLog: " + e.getLocalizedMessage());
+                Log.e(TAG, "uploadGameLogs: " + e.getLocalizedMessage());
             }
         });
     }
@@ -136,11 +151,10 @@ public class SocketHelper {
         socketListeners.clear();
     }
 
-    public void removeSocketListener(SocketHelper socketHelper) {
-        socketListeners.remove(socketListener);
-    }
-
     public void addSocketListener(SocketListener socketListener) {
+        if (socketListener == null) {
+            return;
+        }
         socketListeners.add(socketListener);
     }
 

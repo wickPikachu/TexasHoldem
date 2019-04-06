@@ -1,6 +1,11 @@
 package hk.edu.cityu.cs.fyp.texasholdem.model;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,11 +14,14 @@ import java.util.Stack;
 import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
 import hk.edu.cityu.cs.fyp.texasholdem.TexasHoldemApplication;
 import hk.edu.cityu.cs.fyp.texasholdem.db.GameLog;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
+import hk.edu.cityu.cs.fyp.texasholdem.helper.SocketHelper;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 
 @SuppressLint("DefaultLocale")
 public class TexasHoldem {
 
+    private static final String TAG = "TexasHoldem";
     public static final int BIG_BLIND_BET = 100;
     public static final int ROUNDS_LIMIT = 100;
     // bitwise for actions:
@@ -70,6 +78,9 @@ public class TexasHoldem {
     private String betsResult;
     private String gameLogResults;
     private double bb;
+    private TexasHoldemListener texasHoldemListener;
+    private boolean isAutoSync = false;
+    private SocketHelper socketHelper = SocketHelper.getInstance();
 
     public static TexasHoldem getInstance() {
         return ourInstance;
@@ -82,9 +93,10 @@ public class TexasHoldem {
      * Game Start
      * init player, computer, and settings
      */
-    public void init(AIPlayer aiPlayer) {
+    public void init(AIPlayer aiPlayer, TexasHoldemListener texasHoldemListener) {
         this.isInit = true;
         this.aiPlayer = aiPlayer;
+        this.texasHoldemListener = texasHoldemListener;
         startNewGame();
     }
 
@@ -208,18 +220,56 @@ public class TexasHoldem {
         String[] betsArray = betsResult.split("\\|");
 
         // insert to database
+        GameLog gameLog = new GameLog();
+        gameLog.setResult(gameLogResults);
+        gameLog.setAiPlayer(aiPlayer.getConstantValue());
+        gameLog.setMoney(Double.valueOf(betsArray[0]));
+        gameLog.setBb(BIG_BLIND_BET);
+
         if (isSaveLogs) {
-            Thread t = new Thread() {
-                public void run() {
-                    GameLog gameLog = new GameLog();
-                    gameLog.setResult(gameLogResults);
-                    gameLog.setAiPlayer(aiPlayer.getConstantValue());
-                    gameLog.setMoney(Double.valueOf(betsArray[0]));
-                    gameLog.setBb(bb);
-                    TexasHoldemApplication.db.getResultDao().insert(gameLog);
-                }
-            };
-            t.start();
+            TexasHoldemApplication.postToDataThread(() -> {
+                TexasHoldemApplication.db.getResultDao().insert(gameLog);
+            });
+
+            if (isAutoSync) {
+                socketHelper.connectToServer(new SocketHelper.SocketListener() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        TexasHoldemApplication.postToDataThread(() -> {
+                            if (jsonObject.has(Constants.Json.KEY_SUCCESS)) {
+                                try {
+                                    JSONArray uuidArray = jsonObject.getJSONArray(Constants.Json.KEY_SUCCESS);
+                                    int len = uuidArray.length();
+                                    ArrayList<String> uuids = new ArrayList<>();
+                                    for (int i = 0; i < len; i++) {
+                                        uuids.add(uuidArray.getString(i));
+                                    }
+                                    TexasHoldemApplication.db.getResultDao().updateIsSync(uuids, true);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    Log.e(TAG, "onResponse: " + e.getLocalizedMessage());
+                                }
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String errorMsg) {
+                        Log.e(TAG, "onError: " + errorMsg);
+                    }
+                });
+                socketHelper.uploadGameLog(gameLog);
+            }
+        }
+//        determineGameIsFinish();
+    }
+
+    private void determineGameIsFinish() {
+        boolean nextIsPlayerBigBlindBets = !isPlayerBigBuildBets;
+        if ((nextIsPlayerBigBlindBets && (playerMoney < BIG_BLIND_BET || computerMoney < BIG_BLIND_BET / 2))
+                || (!nextIsPlayerBigBlindBets && (playerMoney < BIG_BLIND_BET / 2 || computerMoney < BIG_BLIND_BET))) {
+            gameFinished();
         }
     }
 
@@ -234,6 +284,7 @@ public class TexasHoldem {
             result = "Computer is winner";
         }
         message = String.format("Game finished!\n (%s)", result);
+        texasHoldemListener.onGameIsFinished();
     }
 
     public void playerFold() {
@@ -278,6 +329,7 @@ public class TexasHoldem {
     public void computerFold() {
         actionHistory += "f";
         playerWin("Computer folded");
+        texasHoldemListener.afterComputerTakeAction();
         endRound();
     }
 
@@ -299,6 +351,7 @@ public class TexasHoldem {
         } else {
             gameState = GameState.ComputerCalled;
         }
+        texasHoldemListener.afterComputerTakeAction();
     }
 
     public void computerRaise(int raiseBets) throws TexasHoldemException {
@@ -311,10 +364,12 @@ public class TexasHoldem {
         actionHistory += "r" + computerBets;
         message = "Computer raised $" + raiseBets;
         gameState = GameState.ComputerRaised;
+        texasHoldemListener.afterComputerTakeAction();
     }
 
     public void takeAction(AIPlayer aiPlayer) {
         aiPlayer.takeAction(this);
+
     }
 
     private void playerWin(String reason) {
@@ -469,6 +524,14 @@ public class TexasHoldem {
         return message;
     }
 
+    public boolean isAutoSync() {
+        return isAutoSync;
+    }
+
+    public void setAutoSync(boolean autoSync) {
+        isAutoSync = autoSync;
+    }
+
     public boolean isSaveLogs() {
         return isSaveLogs;
     }
@@ -498,5 +561,11 @@ public class TexasHoldem {
             doubles[5 + i] = Utils.suitOfCard(tableCardList.get(i));
         }
         return doubles;
+    }
+
+    public interface TexasHoldemListener {
+        public void afterComputerTakeAction();
+
+        public void onGameIsFinished();
     }
 }

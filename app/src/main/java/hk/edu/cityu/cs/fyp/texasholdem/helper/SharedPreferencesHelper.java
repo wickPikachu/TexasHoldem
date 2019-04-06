@@ -1,5 +1,6 @@
 package hk.edu.cityu.cs.fyp.texasholdem.helper;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -14,8 +15,8 @@ public class SharedPreferencesHelper {
         return context.getSharedPreferences(Constants.SharedPref.NAME, Context.MODE_PRIVATE);
     }
 
-    public static AIPlayer getAIPlayer(Context context) {
-        SharedPreferences pref = getSharedPreferences(context);
+    public static AIPlayer getAIPlayer(Activity activity) {
+        SharedPreferences pref = getSharedPreferences(activity.getApplicationContext());
         switch (pref.getInt(Constants.SharedPref.KEY_AI_PLAYER, -1)) {
             default:
             case Constants.AI_PLAYER_RANDOM:
@@ -23,7 +24,7 @@ public class SharedPreferencesHelper {
             case Constants.AI_PLAYER_MINIMAX:
                 return new MiniMaxAIPlayer();
             case Constants.AI_PLAYER_MACHINE_LEARNING:
-                return new MachineLearningAIPlayer();
+                return new MachineLearningAIPlayer(activity);
         }
     }
 

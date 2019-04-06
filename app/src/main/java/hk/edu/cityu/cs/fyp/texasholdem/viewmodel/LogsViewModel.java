@@ -17,7 +17,7 @@ public class LogsViewModel extends ViewModel {
     private LiveData<List<GameLog>> logsLive;
     private LiveData<Integer> countSyncGameLogsLive;
     private LiveData<Integer> countAllGameLogsLive;
-    private LiveData<Double> sumbbLive;
+    private LiveData<Double> sumMoneyDivideBybbLive;
     private LiveData<Double> totalMoneyLive;
     private MutableLiveData<Integer> aiPlayerValueLive;
 
@@ -27,7 +27,7 @@ public class LogsViewModel extends ViewModel {
 
         countSyncGameLogsLive = Transformations.switchMap(aiPlayerValueLive, (aiPlayer) -> gameLogDao.countGameLogsByIsSyncAndAiPlayer(true, aiPlayer));
         countAllGameLogsLive = Transformations.switchMap(aiPlayerValueLive, (aiPlayer) -> gameLogDao.countGameLogsByAIPlayer(aiPlayer));
-        sumbbLive = Transformations.switchMap(aiPlayerValueLive, (aiPlayer) -> gameLogDao.sumbb(aiPlayer));
+        sumMoneyDivideBybbLive = Transformations.switchMap(aiPlayerValueLive, (aiPlayer) -> gameLogDao.sumMoneyDivideBybb(aiPlayer));
         totalMoneyLive = Transformations.switchMap(aiPlayerValueLive, (aiPlayer) -> gameLogDao.getTotalMoney(aiPlayer));
         logsLive = Transformations.switchMap(aiPlayerValueLive, (aiPlayer) -> gameLogDao.findUnsyncGameLogs(aiPlayer));
     }
@@ -48,8 +48,8 @@ public class LogsViewModel extends ViewModel {
         return countAllGameLogsLive;
     }
 
-    public LiveData<Double> getSumbbLive() {
-        return sumbbLive;
+    public LiveData<Double> getSumMoneyDivideBybbLive() {
+        return sumMoneyDivideBybbLive;
     }
 
     public LiveData<Double> getTotalMoneyLive() {
