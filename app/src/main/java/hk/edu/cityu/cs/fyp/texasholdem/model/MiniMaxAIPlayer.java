@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
 
+@Deprecated
 public class MiniMaxAIPlayer extends AIPlayer {
 
     public static final String TAG = "MiniMaxAIPlayer";

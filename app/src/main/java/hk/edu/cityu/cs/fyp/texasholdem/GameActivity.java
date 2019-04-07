@@ -9,12 +9,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +22,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
 import hk.edu.cityu.cs.fyp.texasholdem.db.GameLog;
-import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.SharedPreferencesHelper;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.SocketHelper;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
@@ -101,8 +97,14 @@ public class GameActivity extends AppCompatActivity {
     @BindView(R.id.overlay_message)
     TextView overlayMessageText;
 
+    @BindView(R.id.min_bet)
+    Button minBetButton;
+
     @BindView(R.id.pot_money)
     TextView potText;
+
+    @BindView(R.id.buttons_overlay_layout)
+    LinearLayout overlayButtonsLayout;
 
     GameViewModel gameViewModel;
     TexasHoldem texasHoldem;
@@ -125,6 +127,10 @@ public class GameActivity extends AppCompatActivity {
         } else {
             computerMoneyText.setTextSize(20);
         }
+
+        // remove min bet button
+        // TODO: delete if not bug,
+//        minBetButton.setVisibility(View.GONE);
 
         // TODO: view texasHoldem to control DB
         gameViewModel = ViewModelProviders.of(this).get(GameViewModel.class);
@@ -176,13 +182,15 @@ public class GameActivity extends AppCompatActivity {
             foldButton.setEnabled(false);
             callButton.setEnabled(false);
             raiseButton.setEnabled(false);
+            minBetButton.setEnabled(false);
+            overlayButtonsLayout.setVisibility(View.VISIBLE);
         } else {
             computerCardImage1.setImageResource(R.drawable.gray_back);
             computerCardImage2.setImageResource(R.drawable.gray_back);
+            overlayButtonsLayout.setVisibility(View.GONE);
         }
 
         roundText.setText(String.format("Round: %d", texasHoldem.getRounds()));
-        potText.setText("Pot: " + (texasHoldem.getPot() > 0 ? "$" + texasHoldem.getPot() : "--"));
 
         myMoneyText.setText("$" + texasHoldem.getPlayerMoney());
         myBetsMoneyText.setText("Bet: $" + texasHoldem.getPlayerBets());
@@ -208,15 +216,20 @@ public class GameActivity extends AppCompatActivity {
         if (texasHoldem.isPlayerAction()) {
             foldButton.setEnabled(true);
             callButton.setEnabled(true);
-            raiseButton.setEnabled(true);
+            raiseButton.setEnabled(texasHoldem.getGameState() != TexasHoldem.GameState.ComputerRaised2);
+            minBetButton.setEnabled(texasHoldem.getGameState() != TexasHoldem.GameState.ComputerRaised2);
         } else if (texasHoldem.isComputerAction()) {
             foldButton.setEnabled(false);
             callButton.setEnabled(false);
             raiseButton.setEnabled(false);
+            minBetButton.setEnabled(false);
         }
     }
 
-    @OnClick(R.id.message)
+    @OnClick({
+            R.id.message,
+            R.id.buttons_overlay_layout
+    })
     public void onMessageClicked() {
         if (texasHoldem.isEnded()) {
             texasHoldem.startRound();
@@ -227,7 +240,9 @@ public class GameActivity extends AppCompatActivity {
         updateUI();
     }
 
-    @OnClick(R.id.overlay_layout)
+    @OnClick({
+            R.id.overlay_layout,
+    })
     public void onOverlayLayoutClicked() {
         if (texasHoldem.isEnded()) {
             texasHoldem.startRound();
@@ -243,6 +258,7 @@ public class GameActivity extends AppCompatActivity {
             R.id.fold,
             R.id.call,
             R.id.raise,
+            R.id.min_bet
     })
     public void onButtonClicked(View view) {
         switch (view.getId()) {
@@ -254,11 +270,10 @@ public class GameActivity extends AppCompatActivity {
                 break;
             case R.id.raise:
                 int raiseBets = Integer.parseInt(raiseBetsEditText.getText().toString().trim());
-                try {
-                    texasHoldem.playerRaise(raiseBets);
-                } catch (TexasHoldemException e) {
-                    e.printStackTrace();
-                }
+                texasHoldem.playerRaise(raiseBets);
+                break;
+            case R.id.min_bet:
+                texasHoldem.playerRaise(texasHoldem.getMinBet());
                 break;
         }
 

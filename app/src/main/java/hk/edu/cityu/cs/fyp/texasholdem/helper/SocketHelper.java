@@ -68,7 +68,8 @@ public class SocketHelper {
         } else {
             Log.d(TAG, "connectToServer: socket already connect to " + this.ipAddress + ":" + this.port);
         }
-        socketListeners.add(socketListener);
+        if (!socketListeners.contains(socketListener))
+            socketListeners.add(socketListener);
     }
 
     private Thread recvThread = new Thread(() -> {
@@ -92,7 +93,6 @@ public class SocketHelper {
             }
         } catch (Exception e) {
             Log.e(TAG, "recvThread: " + e.getLocalizedMessage());
-            disconnect();
             clearSocketListeners();
         }
     });

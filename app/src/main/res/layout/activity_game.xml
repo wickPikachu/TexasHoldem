@@ -91,6 +91,7 @@
 
         <TextView
             android:id="@+id/pot_money"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
@@ -241,6 +242,17 @@
             android:text="@string/raise"
             app:layout_constraintBottom_toTopOf="@+id/raise_detail_layout"
             app:layout_constraintLeft_toRightOf="@+id/call"
+            app:layout_constraintRight_toLeftOf="@+id/min_bet"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/min_bet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="@string/min_bet"
+            app:layout_constraintBottom_toTopOf="@+id/raise_detail_layout"
+            app:layout_constraintLeft_toRightOf="@+id/raise"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -351,6 +363,19 @@
         </android.support.constraint.ConstraintLayout>
 
     </android.support.constraint.ConstraintLayout>
+
+    <!-- empty layout for clicking layout to next rounds -->
+
+    <LinearLayout
+        android:id="@+id/buttons_overlay_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#0FFF"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/buttons_layout"
+        app:layout_constraintLeft_toLeftOf="@+id/buttons_layout"
+        app:layout_constraintRight_toRightOf="@+id/buttons_layout"
+        app:layout_constraintTop_toTopOf="@+id/buttons_layout" />
 
     <!-- my cards -->
 

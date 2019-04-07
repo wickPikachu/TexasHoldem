@@ -2,7 +2,6 @@ package hk.edu.cityu.cs.fyp.texasholdem.model;
 
 import java.util.Random;
 
-import hk.edu.cityu.cs.fyp.texasholdem.Exeption.TexasHoldemException;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Constants;
 import hk.edu.cityu.cs.fyp.texasholdem.helper.Utils;
 
@@ -11,6 +10,7 @@ public class RandomAIPlayer extends AIPlayer {
     public static final String NAME = "Random AIPlayer";
 
     private Random random;
+    private int[] raiseX = {1, 2, 4, 8};
 
     public RandomAIPlayer() {
         this.random = new Random();
@@ -26,25 +26,27 @@ public class RandomAIPlayer extends AIPlayer {
         int computerMoney = texasHoldem.getComputerMoney();
         int playerBets = texasHoldem.getPlayerBets();
 
+        TexasHoldem.GameState gameState = texasHoldem.getGameState();
+        boolean maybeFold = gameState != TexasHoldem.GameState.PlayerCalled;
+
         // determine fold or not
-        if (Utils.isPossibleOf(playerBets, playerMoney * 10, random)) {
+        if (maybeFold && texasHoldem.getTurn() != 0 && Utils.isPossibleOf(10, random)) {
             texasHoldem.computerFold();
             return;
         }
 
         // determine raise or not
         if (Utils.isPossibleOf(2) && Math.min(playerMoney, computerMoney) > 0) {
-            try {
-                int raiseBet = random.nextInt(Math.min(playerMoney, computerMoney)) / 100 * 100;
-                if (raiseBet > 0) {
-                    texasHoldem.computerRaise(raiseBet);
-                } else {
-                    texasHoldem.computerCall();
-                }
 
-            } catch (TexasHoldemException e) {
-                e.printStackTrace();
+            int raiseXIndex = random.nextInt(4);
+            int raiseBet = raiseX[raiseXIndex] * texasHoldem.getMinBet();
+
+            if (raiseBet > 0) {
+                texasHoldem.computerRaise(raiseBet);
+            } else {
+                texasHoldem.computerCall();
             }
+
         } else {
             // call
             texasHoldem.computerCall();

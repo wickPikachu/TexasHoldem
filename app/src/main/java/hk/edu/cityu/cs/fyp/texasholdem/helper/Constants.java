@@ -46,7 +46,7 @@ public class Constants {
 
     public static final String HELP_MESSAGE_RULE =
             "<b>How to play?</b><br>" +
-                    "Player can choose fold/call/raise in the game. When the round is end(i.e. shown the winner in middle), you can start a new round by clicking the message.<br>" +
+                    "Player can choose fold/call/raise in the game. When the round is end(i.e. shown the winner in middle), you can start a new round by clicking the message or buttons layout.<br>" +
                     "<br>" +
                     "<b>Highcard (Scattered card)</b><br>" +
                     "If the player does not have any special combination (one pair, or a higher combination ), then the card in hand is called a scattered card.<br>" +

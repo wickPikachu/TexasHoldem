@@ -132,7 +132,6 @@ public class LogsActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        socketHelper.disconnect();
     }
 
     @SuppressLint("DefaultLocale")
