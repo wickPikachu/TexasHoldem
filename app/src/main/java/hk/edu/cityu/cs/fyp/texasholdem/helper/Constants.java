@@ -27,8 +27,8 @@ public class Constants {
     }
 
     public static final int AI_PLAYER_RANDOM = 1;
-    public static final int AI_PLAYER_MINIMAX = 2;
-    public static final int AI_PLAYER_MACHINE_LEARNING = 3;
+    public static final int AI_PLAYER_MACHINE_LEARNING = 2;
+    public static final int AI_PLAYER_MINIMAX = 3;
 
     public static final int CARD_2 = 10001;
     public static final int CARD_3 = 10002;
