@@ -120,7 +120,13 @@ public class LogsActivity extends AppCompatActivity {
     Spinner.OnItemSelectedListener onItemSelectedListener = new Spinner.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-            logsViewModel.setAiPlayerValue(i + 1);
+            if (i == 0) {
+                logsViewModel.setAiPlayerValue(1);
+            } else if (i == 1) {
+                logsViewModel.setAiPlayerValue(3);
+            } else {
+                logsViewModel.setAiPlayerValue(1);
+            }
         }
 
         @Override
