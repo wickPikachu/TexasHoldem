@@ -334,6 +334,13 @@ public class TexasHoldem {
         if (playerMoney < shouldRaise) {
             shouldRaise = playerMoney;
         }
+        if (computerMoney < shouldRaise) {
+            shouldRaise = computerMoney;
+        }
+        boolean isSmallBlind = turn == 0 && playerBets == BIG_BLIND_BET / 2;
+        if (isSmallBlind) {
+            shouldRaise += BIG_BLIND_BET / 2;
+        }
         playerMoney -= shouldRaise;
         playerBets += shouldRaise;
         playerBetsInThisRound += shouldRaise;
@@ -386,6 +393,13 @@ public class TexasHoldem {
         int shouldRaise = playerBets - computerBets + raiseBets;
         if (computerMoney < shouldRaise) {
             shouldRaise = computerMoney;
+        }
+        if (playerMoney < shouldRaise) {
+            shouldRaise = playerMoney;
+        }
+        boolean isSmallBlind = turn == 0 && computerBets == BIG_BLIND_BET / 2;
+        if (isSmallBlind) {
+            shouldRaise += BIG_BLIND_BET / 2;
         }
         computerMoney -= shouldRaise;
         computerBets += shouldRaise;

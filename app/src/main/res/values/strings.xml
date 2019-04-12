@@ -30,7 +30,6 @@
     <string name="min_bet">min bet</string>
     <string-array name="ai_player_array">
         <item>@string/ai_player_random</item>
-        <item>@string/ai_player_minimax</item>
         <item>@string/ai_player_machine_learning</item>
     </string-array>
 
